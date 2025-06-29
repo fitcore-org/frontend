@@ -7,5 +7,8 @@ import { Component } from '@angular/core';
   styleUrl: './header.scss'
 })
 export class Header {
-  
+  public modalMenu : boolean = false;
+  public setModalMenu() : void {
+    this.modalMenu = !this.modalMenu
+  }
 }

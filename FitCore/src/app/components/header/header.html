@@ -3,6 +3,17 @@
         <img src="/Logo.svg">
     </div>
     <div id="header-right">
-        <img src="/Menu.svg">
+        <img src="/Menu.svg" (click)="setModalMenu()">
     </div>
 </div>
+@if(modalMenu){
+    <div id="blur">
+        <div id="modal-menu">
+            <div id="container-top-modal-menu">
+                <img id="logo" src="/Logo-black.svg">
+                <img id="close-modal-menu" src="/Fechar.svg" (click)="setModalMenu()">
+            </div>
+        </div>
+    </div>
+}
+

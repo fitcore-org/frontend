@@ -14,3 +14,37 @@
 #header-right{
     margin-right: 2rem;
 }
+#blur{
+    background-color: #0D0F0D30;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+#modal-menu{
+    background-color: #FFF8F3;
+    display: flex;
+    position: absolute;
+    width: 25%;
+    height: 100%;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    border-radius: 3rem 0 0 3rem;
+    padding-top: 1rem;
+}
+#container-top-modal-menu{
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    height: min-content;
+}
+#close-modal-menu{
+    margin-right: 1rem;
+}
+#logo{
+    color: black;
+    margin-left: 1rem;
+}
