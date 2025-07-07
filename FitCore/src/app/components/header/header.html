@@ -14,7 +14,27 @@
                 <img id="close-modal-menu" src="/Fechar.svg" (click)="setModalMenu()">
             </div>
             <div id="horizontal-row"></div>
-            <div id="container-button-login"><button id="button-login">ENTRAR</button></div>
+            <div id="container-button-login">
+                <button id="button-login" (click)="toLogin(); setModalMenu()">ENTRAR</button>
+            </div>
+            <div id="menu">
+                <div (click)="toHome(); setModalMenu()" class="menu-space" class="menu-item">
+                    <h2 class="menu-title">Home</h2>
+                    <hr class="menu-row">
+                </div>
+                <div class="menu-space" class="menu-item">
+                    <h2 class="menu-title">Lorem</h2>
+                    <hr class="menu-row">
+                </div>
+                <div class="menu-space" class="menu-item">
+                    <h2 class="menu-title">Lorem</h2>
+                    <hr class="menu-row">
+                </div>
+                <div class="menu-space" class="menu-item">
+                    <h2 class="menu-title">Lorem</h2>
+                    <hr class="menu-row">
+                </div>
+            </div>
         </div>
     </div>
 }

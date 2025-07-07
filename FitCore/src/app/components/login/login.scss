@@ -1,0 +1,46 @@
+#container{
+    background-color: #FFF8F3;
+    height: 45rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: row;
+}
+.halter-container{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+.halter{
+    width: 2rem;
+    height: 10rem;
+    background-color: #1F3A26;
+    border-radius: 10px;
+    transform: rotate(5deg);
+}
+.halter-big{
+    width: 2rem;
+    height: 15rem;
+    background-color: #1F3A26;
+    border-radius: 10px;
+    transform: rotate(5deg);
+    margin-right: 5px;
+    margin-left: 5px;
+}
+#login-container{
+    max-width: 40%;
+    width: 100%;
+    height: 40rem;
+    border-radius: 20px;
+    border-style: solid;
+    border-color: #1F3A26;
+    background-color: #1F3A26;
+}
+#bar{
+    width: 10rem;
+    height: 2rem;
+    background-color: #0D0F0D;
+    border-radius: 20px;
+    margin-right: 0.25rem;
+    margin-left: 0.25rem;
+}
