@@ -1,4 +1,6 @@
 import { AfterViewInit, Component, ViewChild, ElementRef} from '@angular/core';
+import { stringify } from 'querystring';
+import { json } from 'stream/consumers';
 
 @Component({
   selector: 'app-login',
@@ -10,11 +12,11 @@ export class Login implements AfterViewInit {
   @ViewChild('halter1') halter1!: ElementRef;
   @ViewChild('halter2') halter2!: ElementRef;
   @ViewChild('halter3') halter3!: ElementRef;
-  @ViewChild('halter4') halter4!: ElementRef
+  @ViewChild('halter4') halter4!: ElementRef;
   ngAfterViewInit(): void {
     this.animationHalterStart()
   }
-  
+
   public animationHalterStart(){
     this.animationHalter()
     setInterval(() => {
@@ -52,5 +54,13 @@ export class Login implements AfterViewInit {
         this.halter3.nativeElement.style.transform = 'scale(1) rotate(5deg)'
         this.halter3.nativeElement.style.transition = 'transform 300ms ease'
       },3500)
+    }
+    @ViewChild('Email') Email!: ElementRef;
+    @ViewChild('Senha') Senha!: ElementRef;
+    public handleSubmit() {
+      JSON.stringify({
+        email: this.Email.nativeElement.value,
+        senha: this.Senha.nativeElement.value,
+      })
     }
 }

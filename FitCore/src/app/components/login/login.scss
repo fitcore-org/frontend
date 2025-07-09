@@ -16,7 +16,38 @@
     border-color: #1F3A26;
     background-color: #0D0F0D00;
     display: flex;
-    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+#form-login{
+    margin-top: 6rem;
+}
+.input{
+    background-color: transparent;
+    border-left: none;
+    border-right: none;
+    border-top: none;
+    border-color: #000000;
+    margin: 0;
+    padding: 0;
+    display: block;
+    width: 25rem;
+    margin-bottom: 1rem;
+    padding: 0.5rem;
+}
+#login-button{
+    width: 100%;
+}
+.input:focus{
+    outline: none;
+}
+#login-button{
+    display: block;
+    border-radius: 20px;
+    background-color: #1F3A26;
+    color: #FFF8F3;
+    border:none;
+    padding: 0.45rem;
 }
 #login-title{
     color: #1F3A26;

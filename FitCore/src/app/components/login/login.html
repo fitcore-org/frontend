@@ -6,6 +6,13 @@
     <div id="bar"></div>
     <div id="login-container">
         <h1 id="login-title">LOGIN</h1>
+        <form method="post" id="form-login" autocomplete="off">
+
+            <input placeholder="Email" type="email" class="input" id="Email" #Email>
+            <input placeholder="Senha" type="password" class="input" id="Senha" #Senha>
+            <button (click)="handleSubmit()" type="submit" id="login-button">Entrar</button>
+
+        </form>
     </div>
     <div id="bar"></div>
     <div class="halter-container">
