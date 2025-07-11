@@ -1,1 +1,31 @@
-<p>main works!</p>
+<div class="page-container">
+    <h1 class="dashboard-title">Dashboard</h1>
+  
+    <div class="segmented-control">
+      <input type="radio" name="segment" id="alunos" [(ngModel)]="tab" value="alunos" checked>
+      <label for="alunos">Alunos</label>
+  
+      <input type="radio" name="segment" id="colaboradores" [(ngModel)]="tab" value="colaboradores">
+      <label for="colaboradores">Colaboradores</label>
+  
+      <input type="radio" name="segment" id="financeiro" [(ngModel)]="tab" value="financeiro">
+      <label for="financeiro">Financeiro</label>
+    </div>
+  
+    <div class="tab-content">
+      <div *ngIf="tab === 'alunos'">
+        <div class="dashboard-placeholder">
+          Dashboard Alunos (embed Grafana aqui)
+        </div>
+      </div>
+  
+      <div *ngIf="tab === 'colaboradores'">
+        <p>Conteúdo de Colaboradores aqui.</p>
+      </div>
+  
+      <div *ngIf="tab === 'financeiro'">
+        <p>Conteúdo de Financeiro aqui.</p>
+      </div>
+    </div>
+  </div>
+  
