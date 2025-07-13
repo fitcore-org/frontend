@@ -4,20 +4,21 @@
         <div class="halter-big" #halter2></div>
     </div>
     <div id="bar"></div>
-    <div id="login-container">
-        <h1 id="login-title">LOGIN</h1>
-        <form method="post" id="form-login" autocomplete="off">
+    <div id="register-container">
+        <h1 id="register-title">CADASTRO</h1>
+        <form method="post" id="form-register" autocomplete="off">
 
+            <input placeholder="Nome" type="text" class="input" id="Nome" #Nome>
             <input placeholder="Email" type="email" class="input" id="Email" #Email>
             <input placeholder="Senha" type="password" class="input" id="Senha" #Senha>
             @if (errorMessage) {
                 <div id="error-message" class="error-text">{{ errorMessage }}</div>
             }
-            <button (click)="handleSubmit($event)" type="button" id="login-button">Entrar</button>
+            <button (click)="handleSubmit($event)" type="button" id="register-button">Cadastrar</button>
 
         </form>
-        <div id="create-account-section">
-            <p (click)="goToRegister()" id="create-account-text">Ainda não tem uma conta? clique <span id="create-account">aqui</span></p>
+        <div id="login-section">
+            <p (click)="goToLogin()" id="login-text">Já tem uma conta? <span id="login-link">entrar</span></p>
         </div>
     </div>
     <div id="bar"></div>

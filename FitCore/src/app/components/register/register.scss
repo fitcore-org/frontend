@@ -6,7 +6,7 @@
     justify-content: center;
     flex-direction: row;
 }
-#login-container{
+#register-container{
     max-width: 35%;
     width: 100%;
     height: 35rem;
@@ -19,8 +19,8 @@
     align-items: center;
     flex-direction: column;
 }
-#form-login{
-    margin-top: 6rem;
+#form-register{
+    margin-top: 4rem;
 }
 .input{
     background-color: transparent;
@@ -35,13 +35,13 @@
     margin-bottom: 1rem;
     padding: 0.5rem;
 }
-#login-button{
+#register-button{
     width: 100%;
 }
 .input:focus{
     outline: none;
 }
-#login-button{
+#register-button{
     display: block;
     border-radius: 20px;
     background-color: #1F3A26;
@@ -51,10 +51,10 @@
     cursor: pointer;
     transition: background-color 0.3s ease;
 }
-#login-button:hover{
+#register-button:hover{
     background-color: #2A4D35;
 }
-#login-title{
+#register-title{
     color: #1F3A26;
     margin-top: 2rem;
     font-weight: 700;
@@ -89,22 +89,21 @@
     margin-right: 0.25rem;
     margin-left: 0.25rem;
 }
-#create-account-section{
+#login-section{
     margin-top: 1rem;
     text-align: center;
 }
-#create-account-text{
+#login-text{
     color: #1F3A26;
     font-size: 0.9rem;
     cursor: pointer;
     margin: 0;
-    text-decoration: underline;
     text-decoration: none;
 }
-#create-account{
+#login-link{
     color: #FFF8F3;
 }
-#create-account:visited{
+#login-link:visited{
     color: #FFF8F3;
     text-decoration: none;
 }

@@ -95,5 +95,7 @@
   },
   "cli": {
     "analytics": "38083262-5c76-43ce-9673-9729016a262a"
-  }
+  },
+  "serve:ssr:FitCore": "node dist/FitCore/server/server.mjs",
+  "start": "ng serve --proxy-config proxy.conf.json"
 }

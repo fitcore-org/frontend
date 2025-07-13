@@ -2,16 +2,17 @@ import { AfterViewInit, Component, ViewChild, ElementRef, inject, ChangeDetector
 import { Router } from '@angular/router';
 
 @Component({
-  selector: 'app-login',
+  selector: 'app-register',
   imports: [],
-  templateUrl: './login.html',
-  styleUrl: './login.scss'
+  templateUrl: './register.html',
+  styleUrl: './register.scss'
 })
-export class Login implements AfterViewInit {
+export class Register implements AfterViewInit {
   @ViewChild('halter1') halter1!: ElementRef;
   @ViewChild('halter2') halter2!: ElementRef;
   @ViewChild('halter3') halter3!: ElementRef;
   @ViewChild('halter4') halter4!: ElementRef;
+  @ViewChild('Nome') Nome!: ElementRef;
   @ViewChild('Email') Email!: ElementRef;
   @ViewChild('Senha') Senha!: ElementRef;
   
@@ -64,33 +65,40 @@ export class Login implements AfterViewInit {
     event.preventDefault();
     this.errorMessage = '';
     
+    const name = this.Nome.nativeElement.value.trim();
     const email = this.Email.nativeElement.value.trim();
     const password = this.Senha.nativeElement.value.trim();
     
-    if (!email || !password) {
+    if (!name || !email || !password) {
       this.errorMessage = 'Por favor, preencha todos os campos';
       this.cdr.detectChanges();
       return;
     }
     
-    const loginData = {
+    const registerData = {
+      name,
       email,
       password,
+      role: "SECRETARY"
     };
 
     try {
-      const response = await fetch('/auth/login', {
+      const response = await fetch('/auth/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(loginData)
+        body: JSON.stringify(registerData)
       });
-      
+
       if (response.ok) {
-        this.router.navigate(['main']);
+        this.router.navigate(['login']);
       } else {
-        this.errorMessage = 'Email ou senha incorretos';
+        if (response.status === 409) {
+          this.errorMessage = 'Este e-mail já está em uso';
+        } else {
+          this.errorMessage = 'Erro ao criar conta. Tente novamente.';
+        }
         this.cdr.detectChanges();
       }
     } catch (error) {
@@ -99,7 +107,7 @@ export class Login implements AfterViewInit {
     }
   }
   
-  public goToRegister(): void {
-    this.router.navigate(['/register']);
+  public goToLogin(): void {
+    this.router.navigate(['/login']);
   }
 }
