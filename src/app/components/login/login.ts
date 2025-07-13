@@ -1,5 +1,6 @@
 import { AfterViewInit, Component, ViewChild, ElementRef, inject, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
+import { AuthService, AuthResponse } from '../../services/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -19,6 +20,7 @@ export class Login implements AfterViewInit {
   
   private router = inject(Router);
   private cdr = inject(ChangeDetectorRef);
+  private authService = inject(AuthService);
   
   ngAfterViewInit(): void {
     this.animationHalterStart();
@@ -88,6 +90,8 @@ export class Login implements AfterViewInit {
       });
       
       if (response.ok) {
+        const authResponse: AuthResponse = await response.json();
+        this.authService.login(authResponse);
         this.router.navigate(['main']);
       } else {
         this.errorMessage = 'Email ou senha incorretos';

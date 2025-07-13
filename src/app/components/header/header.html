@@ -3,10 +3,14 @@
         <img src="/Logo.svg">
     </div>
     <div id="header-right">
-        <img src="/Menu.svg" (click)="setModalMenu()">
+        @if (isAuthenticated$ | async) {
+            <button id="logout-button" (click)="logout()">Sair</button>
+        } @else {
+            <img src="/Menu.svg" (click)="setModalMenu()">
+        }
     </div>
 </div>
-@if(modalMenu){
+@if(modalMenu && !(isAuthenticated$ | async)){
     <div id="blur">
         <div id="modal-menu">
             <div id="container-top-modal-menu">

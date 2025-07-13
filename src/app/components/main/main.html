@@ -1,4 +1,7 @@
 <div class="page-container">
+    @if (currentUser$ | async; as user) {
+        <h1 class="user-welcome">Bem-vindo, {{ user.name }}!</h1>
+    }
     <h1 class="dashboard-title">Dashboard</h1>
   
     <div class="segmented-control">
@@ -13,19 +16,19 @@
     </div>
   
     <div class="tab-content">
-      <div *ngIf="tab === 'alunos'">
+      @if (tab === 'alunos') {
         <div class="dashboard-placeholder">
           Dashboard Alunos (embed Grafana aqui)
         </div>
-      </div>
+      }
   
-      <div *ngIf="tab === 'colaboradores'">
+      @if (tab === 'colaboradores') {
         <p>Conteúdo de Colaboradores aqui.</p>
-      </div>
+      }
   
-      <div *ngIf="tab === 'financeiro'">
+      @if (tab === 'financeiro') {
         <p>Conteúdo de Financeiro aqui.</p>
-      </div>
+      }
     </div>
   </div>
   

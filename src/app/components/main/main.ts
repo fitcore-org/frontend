@@ -1,6 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { AuthService, User } from '../../services/auth.service';
+import { Observable } from 'rxjs';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-main',
@@ -9,8 +12,24 @@ import { FormsModule } from '@angular/forms';
   templateUrl: './main.html',
   styleUrls: ['./main.scss']
 })
-export class Main {
+export class Main implements OnInit {
   tab = 'alunos';
+  
+  private authService = inject(AuthService);
+  private router = inject(Router);
+  
+  public currentUser$: Observable<User | null> = this.authService.currentUser$;
+
+  ngOnInit(): void {
+    // Verificar se o usuário está autenticado
+    if (!this.authService.isAuthenticated()) {
+      this.router.navigate(['/login']);
+      return;
+    }
+    
+    // Verificar se a sessão expirou
+    this.authService.checkSessionExpiration();
+  }
 
   getSliderPosition() {
     switch (this.tab) {

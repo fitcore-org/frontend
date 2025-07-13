@@ -110,3 +110,17 @@
         border-color: #333333;
     }
 }
+#logout-button {
+    background: #ff4444;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.3s ease;
+    
+    &:hover {
+        background: #cc3333;
+    }
+}
