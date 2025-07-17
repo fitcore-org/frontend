@@ -1,8 +1,8 @@
-import { inject } from '@angular/core';
+import { inject, PLATFORM_ID } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
-import { PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
+import { map, filter, take } from 'rxjs/operators';
 
 export const guestGuard: CanActivateFn = (route, state) => {
   const authService = inject(AuthService);
@@ -12,24 +12,18 @@ export const guestGuard: CanActivateFn = (route, state) => {
   if (!isPlatformBrowser(platformId)) {
     return true;
   }
-  const token = localStorage.getItem('auth_token');
-  const userData = localStorage.getItem('user_data');
-  
-  if (token && userData) {
-    try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      const currentTime = Math.floor(Date.now() / 1000);
-      
-      if (payload.exp > currentTime) {
+
+  // Aguardar a inicialização do AuthService
+  return authService.isInitialized$.pipe(
+    filter(initialized => initialized), // Aguardar até estar inicializado
+    take(1), // Pegar apenas o primeiro valor
+    map(() => {
+      if (authService.isAuthenticated()) {
         router.navigate(['/main']);
         return false;
+      } else {
+        return true;
       }
-    } catch (error) {
-      localStorage.removeItem('auth_token');
-      localStorage.removeItem('user_data');
-      localStorage.removeItem('auth_expiration');
-    }
-  }
-
-  return true;
+    })
+  );
 };

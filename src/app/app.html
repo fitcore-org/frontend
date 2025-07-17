@@ -1,3 +1,5 @@
-<app-header/>
-<router-outlet />
-<app-footer/>
+@if (isInitialized$ | async) {
+  <app-header/>
+  <router-outlet />
+  <app-footer/>
+}

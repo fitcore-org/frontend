@@ -28,6 +28,9 @@ export class AuthService {
   private isAuthenticatedSubject = new BehaviorSubject<boolean>(false);
   public isAuthenticated$ = this.isAuthenticatedSubject.asObservable();
 
+  private isInitializedSubject = new BehaviorSubject<boolean>(false);
+  public isInitialized$ = this.isInitializedSubject.asObservable();
+
   constructor(
     private router: Router,
     @Inject(PLATFORM_ID) private platformId: Object
@@ -35,6 +38,8 @@ export class AuthService {
     if (isPlatformBrowser(this.platformId)) {
       this.checkStoredAuth();
       this.startSessionCheck();
+    } else {
+      this.isInitializedSubject.next(true);
     }
   }
 
@@ -54,6 +59,8 @@ export class AuthService {
       // Limpar dados inválidos sem redirecionar
       this.clearAuthData();
     }
+    
+    this.isInitializedSubject.next(true);
   }
 
   private isTokenValid(token: string): boolean {
@@ -143,5 +150,9 @@ export class AuthService {
     if (expirationDate && new Date() > new Date(expirationDate)) {
       this.logout();
     }
+  }
+
+  public isInitialized(): boolean {
+    return this.isInitializedSubject.value;
   }
 }
