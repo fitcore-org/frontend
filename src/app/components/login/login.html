@@ -30,6 +30,11 @@
             @if (errorMessage) {
                 <div id="error-message" class="error-text">{{ errorMessage }}</div>
             }
+            
+            <div class="forgot-password-section">
+                <p (click)="goToPasswordReset()" class="forgot-password-text">Esqueceu sua senha?</p>
+            </div>
+            
             <button (click)="handleSubmit($event)" type="button" id="login-button">Entrar</button>
 
         </form>

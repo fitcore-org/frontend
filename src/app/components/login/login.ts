@@ -113,4 +113,8 @@ export class Login implements AfterViewInit {
   public goToRegister(): void {
     this.router.navigate(['/register']);
   }
+
+  public goToPasswordReset(): void {
+    this.router.navigate(['/password-reset']);
+  }
 }
