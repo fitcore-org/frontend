@@ -8,10 +8,8 @@ import { Router } from '@angular/router';
   styleUrl: './register.scss'
 })
 export class Register implements AfterViewInit {
-  @ViewChild('halter1') halter1!: ElementRef;
-  @ViewChild('halter2') halter2!: ElementRef;
-  @ViewChild('halter3') halter3!: ElementRef;
-  @ViewChild('halter4') halter4!: ElementRef;
+  @ViewChild('dumbbellLeft') dumbbellLeft!: ElementRef;
+  @ViewChild('dumbbellRight') dumbbellRight!: ElementRef;
   @ViewChild('Nome') Nome!: ElementRef;
   @ViewChild('Email') Email!: ElementRef;
   @ViewChild('Senha') Senha!: ElementRef;
@@ -22,43 +20,52 @@ export class Register implements AfterViewInit {
   private cdr = inject(ChangeDetectorRef);
   
   ngAfterViewInit(): void {
-    this.animationHalterStart();
+    this.animationDumbbellStart();
   }
 
-  private animationHalterStart(): void {
-    this.animationHalter();
+  private animationDumbbellStart(): void {
+    this.animateDumbbells();
     setInterval(() => {
-      this.animationHalter();
+      this.animateDumbbells();
     }, 4000);
   }
 
-  private animationHalter(): void {
-    setTimeout(() => {
-      this.halter4.nativeElement.style.transform = 'scale(1) rotate(5deg)';
-      this.halter4.nativeElement.style.transition = 'transform 300ms ease';
-      this.halter1.nativeElement.style.transform = 'scale(1.05) rotate(5deg)';
-      this.halter1.nativeElement.style.transition = 'transform 300ms ease';
-    }, 500);
+  private animateDumbbells(): void {
+    // Reset dumbbells to original position
+    this.dumbbellLeft.nativeElement.classList.remove('lifting');
+    this.dumbbellRight.nativeElement.classList.remove('lifting');
 
+    // Left dumbbell lifts first
     setTimeout(() => {
-      this.halter2.nativeElement.style.transform = 'scale(1.05) rotate(5deg)';
-      this.halter2.nativeElement.style.transition = 'transform 300ms ease';
-      this.halter1.nativeElement.style.transform = 'scale(1) rotate(5deg)';
-      this.halter1.nativeElement.style.transition = 'transform 300ms ease';
+      this.dumbbellLeft.nativeElement.classList.add('lifting');
+    }, 200);
+
+    // Right dumbbell lifts after left
+    setTimeout(() => {
+      this.dumbbellRight.nativeElement.classList.add('lifting');
+    }, 600);
+
+    // Both dumbbells come down
+    setTimeout(() => {
+      this.dumbbellLeft.nativeElement.classList.remove('lifting');
     }, 1500);
 
     setTimeout(() => {
-      this.halter3.nativeElement.style.transform = 'scale(1.05) rotate(5deg)';
-      this.halter3.nativeElement.style.transition = 'transform 300ms ease';
-      this.halter2.nativeElement.style.transform = 'scale(1) rotate(5deg)';
-      this.halter2.nativeElement.style.transition = 'transform 300ms ease';
-    }, 2500);
+      this.dumbbellRight.nativeElement.classList.remove('lifting');
+    }, 1800);
+
+    // Alternate pattern - right first, then left
+    setTimeout(() => {
+      this.dumbbellRight.nativeElement.classList.add('lifting');
+    }, 2400);
 
     setTimeout(() => {
-      this.halter4.nativeElement.style.transform = 'scale(1.05) rotate(5deg)';
-      this.halter4.nativeElement.style.transition = 'transform 300ms ease';
-      this.halter3.nativeElement.style.transform = 'scale(1) rotate(5deg)';
-      this.halter3.nativeElement.style.transition = 'transform 300ms ease';
+      this.dumbbellLeft.nativeElement.classList.add('lifting');
+    }, 2800);
+
+    setTimeout(() => {
+      this.dumbbellRight.nativeElement.classList.remove('lifting');
+      this.dumbbellLeft.nativeElement.classList.remove('lifting');
     }, 3500);
   }
   public async handleSubmit(event: Event): Promise<void> {

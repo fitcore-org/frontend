@@ -1,12 +1,12 @@
 <div id="header">
     <div id="header-left">
-        <img src="/Logo.svg">
+        <img src="/Logo.svg" alt="FitCore Logo" (click)="toHome()">
     </div>
     <div id="header-right">
         @if (isAuthenticated$ | async) {
             <button id="logout-button" (click)="logout()">Sair</button>
         } @else {
-            <img src="/Menu.svg" (click)="setModalMenu()">
+            <img src="/Menu.svg" alt="Menu" (click)="setModalMenu()">
         }
     </div>
 </div>
@@ -14,8 +14,10 @@
     <div id="blur">
         <div id="modal-menu">
             <div id="container-top-modal-menu">
-                <img id="logo" src="/Logo-black.svg">
-                <img id="close-modal-menu" src="/Fechar.svg" (click)="setModalMenu()">
+                <img id="logo" src="/Logo-black.svg" alt="FitCore Logo">
+                <div id="close-modal-menu" (click)="setModalMenu()">
+                    <img src="/Fechar.svg" alt="Fechar">
+                </div>
             </div>
             <div id="horizontal-row"></div>
             <div id="container-button-login">

@@ -1,10 +1,112 @@
-#footer{
-    background-color: black;
+#footer {
+    background: black;
+    border-top: 1px solid rgba(74, 222, 128, 0.2);
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 1rem;
+    padding: 3rem 2rem;
+    position: relative;
+    box-shadow: 0 -4px 30px rgba(0, 0, 0, 0.4);
+    margin-top: auto;
 }
-#copyright{
-    color: #FFF8F3;
+
+#footer-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+    position: relative;
+    z-index: 2;
+    max-width: 800px;
+    width: 100%;
+    text-align: center;
+}
+
+#logo-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+#footer-logo {
+    height: 40px;
+    width: auto;
+    filter: brightness(1.2);
+    transition: all 0.3s ease;
+}
+
+#footer-logo:hover {
+    transform: scale(1.05);
+    filter: brightness(1.4);
+}
+
+#footer-tagline {
+    color: rgba(74, 222, 128, 0.9);
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    margin: 0;
+    text-transform: uppercase;
+}
+
+#footer-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+#copyright {
+    color: rgba(255, 248, 243, 0.9);
+    font-size: 0.95rem;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+    margin: 0;
+    transition: all 0.3s ease;
+}
+
+#footer-subtitle {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.85rem;
+    font-weight: 400;
+    font-style: italic;
+    margin: 0;
+    letter-spacing: 0.2px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    #footer {
+        padding: 2rem 1rem;
+    }
+    
+    #footer-content {
+        gap: 1rem;
+    }
+    
+    #footer-logo {
+        height: 35px;
+    }
+    
+    #footer-tagline {
+        font-size: 0.9rem;
+    }
+    
+    #copyright {
+        font-size: 0.85rem;
+    }
+    
+    #footer-subtitle {
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 480px) {
+    #footer {
+        padding: 1.5rem 1rem;
+    }
+    
+    #footer-content {
+        gap: 0.8rem;
+    }
 }

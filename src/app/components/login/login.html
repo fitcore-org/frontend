@@ -1,15 +1,32 @@
 <div id="container">
-    <div class="halter-container">
-        <div class="halter" #halter1></div>
-        <div class="halter-big" #halter2></div>
+    <div class="dumbbell-container" #dumbbellLeft>
+        <div class="weight-plate"></div>
+        <div class="weight-plate"></div>
+        <div class="weight-plate"></div>
+        <div class="grip-section"></div>
+        <div class="weight-plate"></div>
+        <div class="weight-plate"></div>
+        <div class="weight-plate"></div>
     </div>
-    <div id="bar"></div>
     <div id="login-container">
-        <h1 id="login-title">LOGIN</h1>
+        <h1 id="login-title">FITCORE</h1>
+        <p style="color: rgba(255, 255, 255, 0.7); margin-top: 0.5rem; margin-bottom: 0; font-size: 0.9rem; text-align: center;">Entre na sua conta</p>
         <form method="post" id="form-login" autocomplete="off">
 
-            <input placeholder="Email" type="email" class="input" id="Email" #Email>
-            <input placeholder="Senha" type="password" class="input" id="Senha" #Senha>
+            <div class="input-container">
+                <fieldset class="input-fieldset">
+                    <legend class="input-legend">Email</legend>
+                    <input type="email" class="input" id="Email" #Email required>
+                </fieldset>
+            </div>
+
+            <div class="input-container">
+                <fieldset class="input-fieldset">
+                    <legend class="input-legend">Senha</legend>
+                    <input type="password" class="input" id="Senha" #Senha required>
+                </fieldset>
+            </div>
+
             @if (errorMessage) {
                 <div id="error-message" class="error-text">{{ errorMessage }}</div>
             }
@@ -17,12 +34,16 @@
 
         </form>
         <div id="create-account-section">
-            <p (click)="goToRegister()" id="create-account-text">Ainda não tem uma conta? clique <span id="create-account">aqui</span></p>
+            <p (click)="goToRegister()" id="create-account-text">Ainda não tem uma conta? <span id="create-account">criar conta</span></p>
         </div>
     </div>
-    <div id="bar"></div>
-    <div class="halter-container">
-        <div class="halter-big" #halter3></div>
-        <div class="halter" #halter4></div>
+    <div class="dumbbell-container" #dumbbellRight>
+        <div class="weight-plate"></div>
+        <div class="weight-plate"></div>
+        <div class="weight-plate"></div>
+        <div class="grip-section"></div>
+        <div class="weight-plate"></div>
+        <div class="weight-plate"></div>
+        <div class="weight-plate"></div>
     </div>
 </div>
