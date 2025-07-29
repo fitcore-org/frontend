@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ViewChild, ElementRef, inject, ChangeDetectorRef } from '@angular/core';
+import { AfterViewInit, Component, ViewChild, ElementRef, inject, ChangeDetectorRef, HostListener } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService, AuthResponse } from '../../services/auth.service';
 
@@ -13,7 +13,8 @@ export class Login implements AfterViewInit {
   @ViewChild('dumbbellRight') dumbbellRight!: ElementRef;
   @ViewChild('Email') Email!: ElementRef;
   @ViewChild('Senha') Senha!: ElementRef;
-  
+  @ViewChild('EnterB') EnterB!: ElementRef;
+
   errorMessage: string = '';
   
   private router = inject(Router);
@@ -22,6 +23,11 @@ export class Login implements AfterViewInit {
   
   ngAfterViewInit(): void {
     this.animationDumbbellStart();
+  }
+  
+  @HostListener('keydown.enter')
+  onEnterPressed(): void {
+    this.EnterB.nativeElement.click();
   }
 
   private animationDumbbellStart(): void {
