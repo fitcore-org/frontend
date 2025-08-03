@@ -24,7 +24,6 @@
       <div 
         *ngFor="let workout of getFilteredPublicWorkouts()" 
         class="workout-card"
-        (click)="openWorkoutModal(workout)"
       >
         <div class="workout-header">
           <h3>{{ workout.name }}</h3>
@@ -55,7 +54,19 @@
           </div>
         </div>
         
-        <button class="btn-view-workout">Ver Treino Completo</button>
+        <div class="workout-actions">
+          <button class="btn-view-workout" (click)="openWorkoutModal(workout)">
+            Ver Treino Completo
+          </button>
+          <div class="workout-secondary-actions">
+            <button class="btn-edit-workout" (click)="openEditWorkoutModal(workout); $event.stopPropagation()">
+              ✏️ Editar
+            </button>
+            <button class="btn-delete-workout" (click)="deleteWorkout(workout.id, workout.name); $event.stopPropagation()">
+              🗑️ Deletar
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -67,7 +78,6 @@
       <div 
         *ngFor="let workout of getFilteredPrivateWorkouts()" 
         class="workout-card"
-        (click)="openWorkoutModal(workout)"
       >
         <div class="workout-header">
           <h3>{{ workout.name }}</h3>
@@ -98,7 +108,19 @@
           </div>
         </div>
         
-        <button class="btn-view-workout">Ver Treino Completo</button>
+        <div class="workout-actions">
+          <button class="btn-view-workout" (click)="openWorkoutModal(workout)">
+            Ver Treino Completo
+          </button>
+          <div class="workout-secondary-actions">
+            <button class="btn-edit-workout" (click)="openEditWorkoutModal(workout); $event.stopPropagation()">
+              ✏️ Editar
+            </button>
+            <button class="btn-delete-workout" (click)="deleteWorkout(workout.id, workout.name); $event.stopPropagation()">
+              🗑️ Deletar
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -309,6 +331,15 @@
         </div>
       </div>
 
+      <div class="modal-workout-actions">
+        <button class="btn-edit-workout-modal" (click)="openEditWorkoutModal(selectedWorkout!)">
+          ✏️ Editar Treino
+        </button>
+        <button class="btn-delete-workout-modal" (click)="deleteWorkout(selectedWorkout.id, selectedWorkout.name)">
+          🗑️ Deletar Treino
+        </button>
+      </div>
+
       <h3>Exercícios do Treino</h3>
       
       <div class="exercises-list">
@@ -360,6 +391,175 @@
           </div>
         </div>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para editar treino -->
+<div class="modal-overlay" *ngIf="showEditWorkoutModal" (click)="closeEditWorkoutModal()">
+  <div class="modal-content create-workout-modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Editar Treino</h2>
+      <button class="close-btn" (click)="closeEditWorkoutModal()">&times;</button>
+    </div>
+    
+    <div class="modal-body">
+      <form (ngSubmit)="updateWorkout()" #editWorkoutForm="ngForm">
+        <div class="form-group">
+          <label for="editWorkoutName">Nome do Treino</label>
+          <input 
+            type="text" 
+            id="editWorkoutName"
+            class="form-input" 
+            [(ngModel)]="editWorkout.name"
+            name="editWorkoutName"
+            required
+            placeholder="Digite o nome do treino"
+          >
+        </div>
+        
+        <div class="form-group">
+          <label for="editWorkoutDescription">Descrição</label>
+          <textarea 
+            id="editWorkoutDescription"
+            class="form-textarea" 
+            [(ngModel)]="editWorkout.description"
+            name="editWorkoutDescription"
+            required
+            placeholder="Descreva o treino"
+            rows="3"
+          ></textarea>
+        </div>
+        
+        <div class="exercise-selection">
+          <h3>Editar Exercícios</h3>
+          
+          <div class="exercise-search">
+            <input 
+              type="text" 
+              class="search-input" 
+              placeholder="Buscar exercícios..."
+              [(ngModel)]="exerciseSearch"
+              name="exerciseSearchEdit"
+            >
+          </div>
+          
+          <div class="available-exercises">
+            <h4>Exercícios Disponíveis</h4>
+            <div class="exercises-list">
+              <div 
+                *ngFor="let exercise of getFilteredExercises()" 
+                class="exercise-item selectable"
+                (click)="addExerciseToEditWorkout(exercise)"
+              >
+                <div class="exercise-info">
+                  <span class="exercise-name">{{ exercise.name }}</span>
+                  <span class="muscle-group">{{ exercise.muscleGroup | titlecase }}</span>
+                </div>
+                <button type="button" class="btn-add">+</button>
+              </div>
+            </div>
+          </div>
+          
+          <div class="selected-exercises" *ngIf="editWorkout.items.length > 0">
+            <h4>Exercícios Selecionados ({{ editWorkout.items.length }})</h4>
+            <div class="workout-exercises">
+              <div 
+                *ngFor="let item of editWorkout.items; let i = index" 
+                class="workout-exercise-item"
+              >
+                <div class="exercise-order">
+                  <button 
+                    type="button" 
+                    class="btn-order" 
+                    (click)="moveExerciseInEdit(i, -1)"
+                    [disabled]="i === 0"
+                  >↑</button>
+                  <span class="order-number">{{ i + 1 }}</span>
+                  <button 
+                    type="button" 
+                    class="btn-order" 
+                    (click)="moveExerciseInEdit(i, 1)"
+                    [disabled]="i === editWorkout.items.length - 1"
+                  >↓</button>
+                </div>
+                
+                <div class="exercise-details">
+                  <div class="exercise-name">{{ getExerciseById(item.exerciseId)?.name }}</div>
+                  <div class="exercise-params">
+                    <div class="param-group">
+                      <label>Séries:</label>
+                      <input 
+                        type="number" 
+                        min="1" 
+                        [(ngModel)]="item.sets"
+                        name="edit_sets_{{i}}"
+                        class="param-input"
+                        required
+                      >
+                    </div>
+                    <div class="param-group">
+                      <label>Reps:</label>
+                      <input 
+                        type="text" 
+                        [(ngModel)]="item.reps"
+                        name="edit_reps_{{i}}"
+                        class="param-input"
+                        placeholder="8-12"
+                        required
+                      >
+                    </div>
+                    <div class="param-group">
+                      <label>Descanso (s):</label>
+                      <input 
+                        type="number" 
+                        min="0" 
+                        [(ngModel)]="item.restSeconds"
+                        name="edit_rest_{{i}}"
+                        class="param-input"
+                        required
+                      >
+                    </div>
+                  </div>
+                  <div class="observation-group">
+                    <label>Observação:</label>
+                    <input 
+                      type="text" 
+                      [(ngModel)]="item.observation"
+                      name="edit_observation_{{i}}"
+                      class="param-input"
+                      placeholder="Observações opcionais"
+                    >
+                  </div>
+                </div>
+                
+                <button 
+                  type="button" 
+                  class="btn-remove" 
+                  (click)="removeExerciseFromEditWorkout(i)"
+                >×</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="modal-actions">
+          <button 
+            type="button" 
+            class="btn-cancel" 
+            (click)="closeEditWorkoutModal()"
+          >
+            Cancelar
+          </button>
+          <button 
+            type="submit" 
+            class="btn-update" 
+            [disabled]="!editWorkoutForm.valid || editWorkout.items.length === 0"
+          >
+            Atualizar Treino
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 </div>

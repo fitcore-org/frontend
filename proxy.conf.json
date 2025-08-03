@@ -19,6 +19,11 @@
     "secure": false,
     "changeOrigin": true
   },
+  "/api/v1/workouts/*": {
+    "target": "http://localhost:8082",
+    "secure": false,
+    "changeOrigin": true
+  },
   "/api/v1/exercises": {
     "target": "http://localhost:8082",
     "secure": false,

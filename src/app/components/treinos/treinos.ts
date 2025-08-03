@@ -38,6 +38,12 @@ interface CreateWorkoutRequest {
   items: CreateWorkoutItem[];
 }
 
+interface UpdateWorkoutRequest {
+  name: string;
+  description: string;
+  items: CreateWorkoutItem[];
+}
+
 interface Workout {
   id: string;
   name: string;
@@ -71,6 +77,15 @@ export class Treinos implements OnInit {
     description: '',
     items: []
   };
+
+  // Edit workout modal properties
+  showEditWorkoutModal = false;
+  editWorkout: UpdateWorkoutRequest = {
+    name: '',
+    description: '',
+    items: []
+  };
+  editWorkoutId: string = '';
 
   get workoutSearch(): string {
     return this.searchTerm();
@@ -254,6 +269,121 @@ export class Treinos implements OnInit {
       error: (error) => {
         console.error('Erro ao criar treino:', error);
         alert('Erro ao criar treino. Tente novamente.');
+      }
+    });
+  }
+
+  deleteWorkout(workoutId: string, workoutName: string): void {
+    if (confirm(`Tem certeza que deseja deletar o treino "${workoutName}"? Esta ação não pode ser desfeita.`)) {
+      this.http.delete(`/api/v1/workouts/${workoutId}`).subscribe({
+        next: () => {
+          alert('Treino deletado com sucesso!');
+          this.loadPublicWorkouts();
+          this.loadPrivateWorkouts();
+          // Fechar modal se o treino deletado estava sendo visualizado
+          if (this.selectedWorkout && this.selectedWorkout.id === workoutId) {
+            this.closeWorkoutModal();
+          }
+        },
+        error: (error) => {
+          console.error('Erro ao deletar treino:', error);
+          alert('Erro ao deletar treino. Tente novamente.');
+        }
+      });
+    }
+  }
+
+  // Edit workout modal methods
+  openEditWorkoutModal(workout: Workout): void {
+    this.editWorkoutId = workout.id;
+    this.editWorkout = {
+      name: workout.name,
+      description: workout.description,
+      items: workout.items.map(item => ({
+        exerciseId: item.exercise.id,
+        sets: item.sets,
+        reps: item.reps,
+        restSeconds: item.restSeconds,
+        observation: item.observation,
+        order: item.order
+      }))
+    };
+    this.showEditWorkoutModal = true;
+    this.exerciseSearchTerm.set('');
+    
+    // Fechar modal de detalhes se estiver aberto
+    if (this.selectedWorkout) {
+      this.closeWorkoutModal();
+    }
+  }
+
+  closeEditWorkoutModal(): void {
+    this.showEditWorkoutModal = false;
+    this.editWorkout = {
+      name: '',
+      description: '',
+      items: []
+    };
+    this.editWorkoutId = '';
+    this.exerciseSearchTerm.set('');
+  }
+
+  addExerciseToEditWorkout(exercise: Exercise): void {
+    const newItem: CreateWorkoutItem = {
+      exerciseId: exercise.id,
+      sets: '3',
+      reps: '12',
+      restSeconds: 60,
+      observation: '',
+      order: this.editWorkout.items.length + 1
+    };
+    
+    this.editWorkout.items.push(newItem);
+  }
+
+  removeExerciseFromEditWorkout(index: number): void {
+    this.editWorkout.items.splice(index, 1);
+    // Reorder items
+    this.editWorkout.items.forEach((item, i) => {
+      item.order = i + 1;
+    });
+  }
+
+  moveExerciseInEdit(index: number, direction: number): void {
+    const newIndex = index + direction;
+    if (newIndex < 0 || newIndex >= this.editWorkout.items.length) return;
+    
+    const items = [...this.editWorkout.items];
+    [items[index], items[newIndex]] = [items[newIndex], items[index]];
+    
+    // Update orders
+    items.forEach((item, i) => {
+      item.order = i + 1;
+    });
+    
+    this.editWorkout.items = items;
+  }
+
+  updateWorkout(): void {
+    if (!this.editWorkout.name.trim() || this.editWorkout.items.length === 0) {
+      alert('Por favor, preencha o nome do treino e adicione pelo menos um exercício.');
+      return;
+    }
+
+    this.http.put(`/api/v1/workouts/${this.editWorkoutId}`, this.editWorkout).subscribe({
+      next: () => {
+        alert('Treino atualizado com sucesso!');
+        this.closeEditWorkoutModal();
+        this.loadPublicWorkouts();
+        this.loadPrivateWorkouts();
+        // Fechar modal de detalhes se estava aberto
+        if (this.selectedWorkout && this.selectedWorkout.id === this.editWorkoutId) {
+          this.closeWorkoutModal();
+        }
+      },
+      error: (error) => {
+        console.error('Erro ao atualizar treino:', error);
+        alert('Erro ao atualizar treino. Tente novamente.');
       }
     });
   }
