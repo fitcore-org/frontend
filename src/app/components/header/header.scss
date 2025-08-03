@@ -34,6 +34,64 @@
     position: relative;
 }
 
+/* ===== MENU CENTRALIZADO ===== */
+#header-center {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2;
+    position: relative;
+}
+
+#main-menu {
+    display: flex;
+    gap: 2rem;
+    align-items: center;
+}
+
+.menu-link {
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 1rem;
+    text-decoration: none;
+    cursor: pointer;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(74, 222, 128, 0.2);
+    position: relative;
+    overflow: hidden;
+}
+
+.menu-link::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(74, 222, 128, 0.2), transparent);
+    transition: left 0.6s ease;
+}
+
+.menu-link:hover {
+    color: #4ade80;
+    background: rgba(74, 222, 128, 0.15);
+    border-color: rgba(74, 222, 128, 0.5);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(74, 222, 128, 0.3);
+}
+
+.menu-link:hover::before {
+    left: 100%;
+}
+
+.menu-link:active {
+    transform: translateY(0);
+}
+
 #header-right {
     margin-right: 2.5rem;
     display: flex;
@@ -399,6 +457,7 @@
     position: relative;
     overflow: hidden;
     z-index: 1001;
+    width: 11.25rem;
 }
 
 #logout-button::before {

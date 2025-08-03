@@ -1,20 +1,32 @@
 import { Routes } from '@angular/router';
-import { Main } from './components/main/main'
+import { Dashboards } from './components/dashboards/dashboards'
 import { Login } from './components/login/login'
 import { Register } from './components/register/register'
 import { PasswordReset } from './components/password-reset/password-reset-new'
 import { authGuard } from './guards/auth.guard';
 import { guestGuard } from './guards/guest.guard';
+import { Alunos } from './components/alunos/alunos';
+import { Funcionarios } from './components/funcionarios/funcionarios'
 
 export const routes: Routes = [
     {
         path: '',
-        component: Main,
+        component: Dashboards,
         canActivate: [authGuard]
     },
     {
-        path: 'main',
-        component: Main,
+        path: 'dashboards',
+        component: Dashboards,
+        canActivate: [authGuard]
+    },
+    {
+        path: 'alunos',
+        component: Alunos,
+        canActivate: [authGuard]
+    },
+    {
+        path: 'funcionarios',
+        component: Funcionarios,
         canActivate: [authGuard]
     },
     {

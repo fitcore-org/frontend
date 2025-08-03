@@ -17,6 +17,7 @@ export class Header {
   public modalMenu: boolean = false;
   public isAuthenticated$: Observable<boolean> = this.authService.isAuthenticated$;
   public currentUser$: Observable<User | null> = this.authService.currentUser$;
+  
   public setModalMenu(): void {
     this.modalMenu = !this.modalMenu;
   }
@@ -27,6 +28,18 @@ export class Header {
   
   public toHome(): void {
     this.router.navigate(['']);
+  }
+  
+  public toDashboards(): void {
+    this.router.navigate(['/dashboards']);
+  }
+  
+  public toAlunos(): void {
+    this.router.navigate(['/alunos']);
+  }
+  
+  public toFuncionarios(): void {
+    this.router.navigate(['/funcionarios'])
   }
   
   public logout(): void {

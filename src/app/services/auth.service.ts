@@ -56,7 +56,7 @@ export class AuthService {
       this.currentUserSubject.next(user);
       this.isAuthenticatedSubject.next(true);
     } else {
-      // Limpar dados inválidos sem redirecionar
+      
       this.clearAuthData();
     }
     

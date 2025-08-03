@@ -1,0 +1,28 @@
+<div class="page-container">
+    @if (currentUser$ | async; as user) {
+        <h1 class="user-welcome">Bem-vindo, {{ user.name }}!</h1>
+    }
+    <h1 class="dashboard-title">Menu</h1>
+  
+    <div class="segmented-control">
+      <input type="radio" name="segment" id="Dashboard" [(ngModel)]="tab" value="Dashboard" checked>
+      <label for="Dashboard">Dashboard</label>
+
+      <input type="radio" name="segment" id="Financeiro" [(ngModel)]="tab" value="Financeiro">
+      <label for="Financeiro">Financeiro</label>
+
+    </div>
+  
+    <div class="tab-content">
+      @if (tab === 'Dashboard') {
+        <div class="dashboard-placeholder">
+          <iframe id="iframe" src="http://localhost:3000/d/detc98fmewmioc/analise-dos-feedbacks?orgId=1&refresh=5s&kiosk"></iframe>
+        </div>
+      }
+
+      @if (tab === 'Financeiro') {
+        <p>Conteúdo de Financeiro aqui.</p>
+      }
+    </div>
+  </div>
+  

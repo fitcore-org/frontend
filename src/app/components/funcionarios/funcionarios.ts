@@ -1,27 +1,7 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { AuthService, User } from '../../services/auth.service';
-import { Observable } from 'rxjs';
-import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
-
-interface Student {
-  id: string;
-  name: string;
-  email: string;
-  cpf: string;
-  birthDate: string;
-  phone: string;
-  planType: string;
-  planDescription: string;
-  weight: number;
-  height: number;
-  bmi: number;
-  active: boolean;
-  registrationDate: string;
-  profileUrl?: string;
-}
 
 interface Employee {
   id: string;
@@ -40,50 +20,27 @@ interface Employee {
 }
 
 @Component({
-  selector: 'app-main',
+  selector: 'app-funcionarios',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './main.html',
-  styleUrls: ['./main.scss']
+  templateUrl: './funcionarios.html',
+  styleUrl: './funcionarios.scss'
 })
-export class Main implements OnInit {
-  tab = 'Dashboard';
-  students: Student[] = [];
+export class Funcionarios implements OnInit {
   employees: Employee[] = [];
-  filteredStudents: Student[] = [];
   filteredEmployees: Employee[] = [];
-  selectedStudent: Student | null = null;
   selectedEmployee: Employee | null = null;
-  isStudentModalOpen = false;
   isEmployeeModalOpen = false;
   
-  studentSearch = '';
   employeeSearch = '';
   selectedRole = '';
   roles = ['MANAGER', 'INSTRUCTOR', 'RECEPTIONIST'];
   
-  private authService = inject(AuthService);
-  private router = inject(Router);
   private http = inject(HttpClient);
-  
-  public currentUser$: Observable<User | null> = this.authService.currentUser$;
+  private cdr = inject(ChangeDetectorRef);
 
   ngOnInit(): void {
-    this.authService.checkSessionExpiration();
-    this.loadStudents();
     this.loadEmployees();
-  }
-
-  loadStudents(): void {
-    this.http.get<Student[]>('/api/students').subscribe({
-      next: (data) => {
-        this.students = data;
-        this.filteredStudents = data;
-      },
-      error: (error) => {
-        console.error('Erro ao carregar alunos:', error);
-      }
-    });
   }
 
   loadEmployees(): void {
@@ -91,46 +48,34 @@ export class Main implements OnInit {
       next: (data) => {
         this.employees = data;
         this.filteredEmployees = data;
+        this.cdr.detectChanges(); // Força detecção de mudanças para zoneless
       },
       error: (error) => {
-        console.error('Erro ao carregar empregados:', error);
+        console.error('Erro ao carregar funcionários:', error);
       }
     });
   }
 
   // Filtros
-  filterStudents(): void {
-    this.filteredStudents = this.students.filter(student =>
-      student.name.toLowerCase().includes(this.studentSearch.toLowerCase())
-    );
-  }
-
   filterEmployees(): void {
     this.filteredEmployees = this.employees.filter(employee => {
       const matchesName = employee.name.toLowerCase().includes(this.employeeSearch.toLowerCase());
       const matchesRole = this.selectedRole === '' || employee.role === this.selectedRole;
       return matchesName && matchesRole;
     });
-  }
-
-  openStudentModal(student: Student): void {
-    this.selectedStudent = student;
-    this.isStudentModalOpen = true;
-  }
-
-  closeStudentModal(): void {
-    this.isStudentModalOpen = false;
-    this.selectedStudent = null;
+    this.cdr.detectChanges(); // Força detecção de mudanças para zoneless
   }
 
   openEmployeeModal(employee: Employee): void {
     this.selectedEmployee = employee;
     this.isEmployeeModalOpen = true;
+    this.cdr.detectChanges(); // Força detecção de mudanças para zoneless
   }
 
   closeEmployeeModal(): void {
     this.isEmployeeModalOpen = false;
     this.selectedEmployee = null;
+    this.cdr.detectChanges(); // Força detecção de mudanças para zoneless
   }
 
   getDefaultAvatar(): string {
@@ -151,19 +96,6 @@ export class Main implements OnInit {
         return 'Recepcionista';
       default:
         return role;
-    }
-  }
-
-  getSliderPosition() {
-    switch (this.tab) {
-      case 'alunos':
-        return 'translateX(0%)';
-      case 'colaboradores':
-        return 'translateX(100%)';
-      case 'financeiro':
-        return 'translateX(200%)';
-      default:
-        return 'translateX(0%)';
     }
   }
 }

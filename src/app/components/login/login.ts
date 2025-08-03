@@ -105,7 +105,7 @@ export class Login implements AfterViewInit {
       if (response.ok) {
         const authResponse: AuthResponse = await response.json();
         this.authService.login(authResponse);
-        this.router.navigate(['main']);
+        this.router.navigate(['dashboards']);
       } else {
         this.errorMessage = 'Email ou senha incorretos';
         this.cdr.detectChanges();

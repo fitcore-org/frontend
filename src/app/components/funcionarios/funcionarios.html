@@ -1,0 +1,68 @@
+<div class="page-container">
+  <h1 class="funcionarios-title">Funcionários</h1>
+  
+  <div class="filter-container">
+    <input type="text" 
+           [(ngModel)]="employeeSearch" 
+           (input)="filterEmployees()" 
+           placeholder="Buscar funcionário por nome..." 
+           class="search-input">
+    <select [(ngModel)]="selectedRole" (change)="filterEmployees()" class="role-filter">
+      <option value="">Todos os papéis</option>
+      <option value="MANAGER">Gerente</option>
+      <option value="INSTRUCTOR">Instrutor</option>
+      <option value="RECEPTIONIST">Recepcionista</option>
+    </select>
+  </div>
+  
+  <div class="employees-container">
+    @for (employee of filteredEmployees; track employee.id) {
+      <div class="employee-card">
+        <h3>{{ employee.name }}</h3>
+        <div class="profile-image-container">
+          <img [src]="getProfileImage(employee.profileUrl)" alt="Foto do funcionário" class="profile-image">
+        </div>
+        <p><strong>CPF:</strong> {{ employee.cpf }}</p>
+        <p><strong>Telefone:</strong> {{ employee.phone }}</p>
+        <p><strong>Email:</strong> {{ employee.email }}</p>
+        <p><strong>Papel:</strong> {{ getRoleDisplayName(employee.role) }}</p>
+        <button class="btn-read-more" (click)="openEmployeeModal(employee)">Ler mais</button>
+      </div>
+    }
+    @if (filteredEmployees.length === 0) {
+      <p class="no-results">Nenhum funcionário encontrado.</p>
+    }
+  </div>
+</div>
+
+<!-- Modal para detalhes do funcionário -->
+@if (isEmployeeModalOpen && selectedEmployee) {
+  <div class="modal-overlay" (click)="closeEmployeeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>{{ selectedEmployee.name }}</h2>
+        <button class="btn-close" (click)="closeEmployeeModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-image-container">
+          <img [src]="getProfileImage(selectedEmployee.profileUrl)" alt="Foto do funcionário" class="modal-profile-image">
+        </div>
+        <div class="employee-details">
+          <p><strong>Nome:</strong> {{ selectedEmployee.name }}</p>
+          <p><strong>Email:</strong> {{ selectedEmployee.email }}</p>
+          <p><strong>CPF:</strong> {{ selectedEmployee.cpf }}</p>
+          <p><strong>Data de Nascimento:</strong> {{ selectedEmployee.birthDate | date:'dd/MM/yyyy' }}</p>
+          <p><strong>Telefone:</strong> {{ selectedEmployee.phone }}</p>
+          <p><strong>Papel:</strong> {{ getRoleDisplayName(selectedEmployee.role) }}</p>
+          <p><strong>Descrição do Papel:</strong> {{ selectedEmployee.roleDescription }}</p>
+          <p><strong>Status:</strong> {{ selectedEmployee.active ? 'Ativo' : 'Inativo' }}</p>
+          <p><strong>Data de Contratação:</strong> {{ selectedEmployee.hireDate | date:'dd/MM/yyyy' }}</p>
+          @if (selectedEmployee.terminationDate) {
+            <p><strong>Data de Demissão:</strong> {{ selectedEmployee.terminationDate | date:'dd/MM/yyyy' }}</p>
+          }
+          <p><strong>Data de Cadastro:</strong> {{ selectedEmployee.registrationDate | date:'dd/MM/yyyy HH:mm' }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+}

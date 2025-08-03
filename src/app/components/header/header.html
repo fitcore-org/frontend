@@ -2,6 +2,15 @@
     <div id="header-left">
         <img src="/Logo.svg" alt="FitCore Logo" (click)="toHome()">
     </div>
+    @if (isAuthenticated$ | async; as authenticated) {
+        <div id="header-center">
+            <nav id="main-menu">
+                <a (click)="toDashboards()" class="menu-link">Dashboards</a>
+                <a (click)="toAlunos()" class="menu-link">Alunos</a>
+                <a (click)="toFuncionarios()" class="menu-link">Funcionarios</a>
+            </nav>
+        </div>
+    }
     <div id="header-right">
         @if (isAuthenticated$ | async) {
             <button id="logout-button" (click)="logout()">Sair</button>
@@ -24,12 +33,12 @@
                 <button id="button-login" (click)="toLogin(); setModalMenu()">ENTRAR</button>
             </div>
             <div id="menu">
-                <div (click)="toHome(); setModalMenu()" class="menu-space" class="menu-item">
-                    <h2 class="menu-title">Home</h2>
+                <div (click)="toDashboards(); setModalMenu()" class="menu-space" class="menu-item">
+                    <h2 class="menu-title">Dashboards</h2>
                     <hr class="menu-row">
                 </div>
-                <div class="menu-space" class="menu-item">
-                    <h2 class="menu-title">Lorem</h2>
+                <div (click)="toAlunos(); setModalMenu()" class="menu-space" class="menu-item">
+                    <h2 class="menu-title">Alunos</h2>
                     <hr class="menu-row">
                 </div>
                 <div class="menu-space" class="menu-item">

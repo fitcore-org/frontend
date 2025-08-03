@@ -1,0 +1,69 @@
+<div class="page-container">
+  <h1 class="page-title">Alunos</h1>
+  
+  <div class="filter-container">
+    <input type="text" 
+           [(ngModel)]="studentSearch" 
+           placeholder="Buscar aluno por nome..." 
+           class="search-input">
+  </div>
+  
+  <div class="students-container">
+    @for (student of filteredStudents(); track student.id) {
+      <div class="student-card">
+        <h3>{{ student.name }}</h3>
+        <div class="profile-image-container">
+          <img [src]="getProfileImage(student.profileUrl)" alt="Foto do aluno" class="profile-image">
+        </div>
+        <p><strong>CPF:</strong> {{ student.cpf }}</p>
+        <p><strong>Telefone:</strong> {{ student.phone }}</p>
+        <p><strong>Email:</strong> {{ student.email }}</p>
+        <button class="btn-read-more" (click)="openStudentModal(student)">Ler mais</button>
+      </div>
+    }
+    @if (filteredStudents().length === 0) {
+      <p class="no-results">Nenhum aluno encontrado.</p>
+    }
+  </div>
+</div>
+
+@if (isStudentModalOpen && selectedStudent) {
+  <div class="modal-overlay" (click)="closeStudentModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>{{ selectedStudent.name }}</h2>
+        <button class="close-btn" (click)="closeStudentModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="profile-section">
+          <img [src]="getProfileImage(selectedStudent.profileUrl)" alt="Foto do aluno" class="modal-profile-image">
+          <div class="profile-info">
+            <p><strong>Email:</strong> {{ selectedStudent.email }}</p>
+            <p><strong>CPF:</strong> {{ selectedStudent.cpf }}</p>
+            <p><strong>Data de Nascimento:</strong> {{ selectedStudent.birthDate | date:'dd/MM/yyyy' }}</p>
+            <p><strong>Telefone:</strong> {{ selectedStudent.phone }}</p>
+            <p><strong>Status:</strong> 
+              <span [class]="selectedStudent.active ? 'status-active' : 'status-inactive'">
+                {{ selectedStudent.active ? 'Ativo' : 'Inativo' }}
+              </span>
+            </p>
+          </div>
+        </div>
+        
+        <div class="plan-section">
+          <h3>Informações do Plano</h3>
+          <p><strong>Tipo de Plano:</strong> {{ selectedStudent.planType }}</p>
+          <p><strong>Descrição:</strong> {{ selectedStudent.planDescription }}</p>
+          <p><strong>Data de Registro:</strong> {{ selectedStudent.registrationDate | date:'dd/MM/yyyy' }}</p>
+        </div>
+        
+        <div class="physical-section">
+          <h3>Informações Físicas</h3>
+          <p><strong>Peso:</strong> {{ selectedStudent.weight }}kg</p>
+          <p><strong>Altura:</strong> {{ selectedStudent.height }}cm</p>
+          <p><strong>IMC:</strong> {{ selectedStudent.bmi | number:'1.1-1' }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+}
