@@ -70,7 +70,7 @@
                 </div>
             </div>
             <div id="horizontal-row"></div>
-            <div id="menu">
+            <div id="menu" #menuAuth>
                 <div id="menu-items">
                     <div (click)="setModalMenuAuth(); toDashboards()" class="menu-space" class="menu-item" [class.active-menu-item]="activeRoute === 'dashboards'">
                         <h2 class="menu-title">Dashboards</h2>
@@ -100,4 +100,3 @@
         </div>
     </div>
 }
-
