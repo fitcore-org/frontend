@@ -5,15 +5,22 @@
     @if (isAuthenticated$ | async; as authenticated) {
         <div id="header-center">
             <nav id="main-menu">
-                <a (click)="toDashboards()" class="menu-link">Dashboards</a>
-                <a (click)="toAlunos()" class="menu-link">Alunos</a>
-                <a (click)="toFuncionarios()" class="menu-link">Funcionarios</a>
+                <a (click)="toDashboards()" class="menu-link" [class.active]="activeRoute === 'dashboards'">Dashboards</a>
+                <a (click)="toAlunos()" class="menu-link" [class.active]="activeRoute === 'alunos'">Alunos</a>
+                <a (click)="toFuncionarios()" class="menu-link" [class.active]="activeRoute === 'funcionarios'">Funcionarios</a>
+                <a (click)="toFinanceiro()" class="menu-link" [class.active]="activeRoute === 'financeiro'">Financeiro</a>
+                <a (click)="toTreinos()" class="menu-link" [class.active]="activeRoute === 'treinos'">Treinos</a>
             </nav>
         </div>
     }
     <div id="header-right">
         @if (isAuthenticated$ | async) {
-            <button id="logout-button" (click)="logout()">Sair</button>
+            <div id="mobile-menu-container">
+                <img src="/Menu.svg" alt="Menu" (click)="setModalMenuAuth()" class="mobile-menu-button">
+            </div>
+            @if (!modalMenuAuth) {
+                <button id="logout-button" (click)="logout()">Sair</button>
+            }
         } @else {
             <img src="/Menu.svg" alt="Menu" (click)="setModalMenu()">
         }
@@ -48,6 +55,46 @@
                 <div class="menu-space" class="menu-item">
                     <h2 class="menu-title">Lorem</h2>
                     <hr class="menu-row">
+                </div>
+            </div>
+        </div>
+    </div>
+}
+@if(modalMenuAuth && (isAuthenticated$ | async)){
+    <div id="blur">
+        <div id="modal-menu-auth">
+            <div id="container-top-modal-menu">
+                <img id="logo" src="/Logo-black.svg" alt="FitCore Logo">
+                <div id="close-modal-menu" (click)="setModalMenuAuth()">
+                    <img src="/Fechar.svg" alt="Fechar">
+                </div>
+            </div>
+            <div id="horizontal-row"></div>
+            <div id="menu">
+                <div id="menu-items">
+                    <div (click)="setModalMenuAuth(); toDashboards()" class="menu-space" class="menu-item" [class.active-menu-item]="activeRoute === 'dashboards'">
+                        <h2 class="menu-title">Dashboards</h2>
+                        <hr class="menu-row">
+                    </div>
+                    <div (click)="setModalMenuAuth(); toAlunos()" class="menu-space" class="menu-item" [class.active-menu-item]="activeRoute === 'alunos'">
+                        <h2 class="menu-title">Alunos</h2>
+                        <hr class="menu-row">
+                    </div>
+                    <div (click)="setModalMenuAuth(); toFuncionarios()" class="menu-space" class="menu-item" [class.active-menu-item]="activeRoute === 'funcionarios'">
+                        <h2 class="menu-title">Funcionarios</h2>
+                        <hr class="menu-row">
+                    </div>
+                    <div (click)="setModalMenuAuth(); toFinanceiro()" class="menu-space" class="menu-item" [class.active-menu-item]="activeRoute === 'financeiro'">
+                        <h2 class="menu-title">Financeiro</h2>
+                        <hr class="menu-row">
+                    </div>
+                    <div (click)="setModalMenuAuth(); toTreinos()" class="menu-space" class="menu-item" [class.active-menu-item]="activeRoute === 'treinos'">
+                        <h2 class="menu-title">Treinos</h2>
+                        <hr class="menu-row">
+                    </div>
+                </div>
+                <div id="container-button-logout">
+                    <button id="button-logout" (click)="logout(); setModalMenuAuth()">SAIR</button>
                 </div>
             </div>
         </div>
