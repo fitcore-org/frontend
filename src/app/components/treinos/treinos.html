@@ -1,1 +1,365 @@
-<p>treinos works!</p>
+<div class="page-container">
+  <div class="page-header">
+    <h1 class="page-title">Treinos Disponíveis</h1>
+  </div>
+  
+  <div class="filter-container">
+    <input 
+      type="text" 
+      class="search-input" 
+      placeholder="Buscar treinos por nome, descrição ou grupo muscular..."
+      [(ngModel)]="workoutSearch"
+    >
+  </div>
+
+  <!-- Seção de Treinos Públicos -->
+  <div class="workout-section" *ngIf="getFilteredPublicWorkouts().length > 0">
+    <div class="section-header">
+      <h2 class="section-title">Treinos Públicos</h2>
+      <button class="btn-create-workout" (click)="openCreateWorkoutModal()">
+        Criar Treino Público
+      </button>
+    </div>
+    <div class="workouts-container">
+      <div 
+        *ngFor="let workout of getFilteredPublicWorkouts()" 
+        class="workout-card"
+        (click)="openWorkoutModal(workout)"
+      >
+        <div class="workout-header">
+          <h3>{{ workout.name }}</h3>
+          <span class="workout-type public">Público</span>
+        </div>
+        
+        <p class="workout-description">{{ workout.description }}</p>
+        
+        <div class="workout-stats">
+          <div class="stat">
+            <strong>{{ workout.items.length }}</strong> exercícios
+          </div>
+          <div class="stat">
+            <strong>{{ calculateTotalSets(workout) }}</strong> séries
+          </div>
+          <div class="stat">
+            <strong>{{ getMainMuscleGroups(workout) }}</strong>
+          </div>
+        </div>
+        
+        <div class="exercise-preview">
+          <div *ngFor="let item of workout.items.slice(0, 3)" class="exercise-item">
+            <span class="exercise-name">{{ item.exercise.name }}</span>
+            <span class="exercise-sets">{{ item.sets }}x{{ item.reps }}</span>
+          </div>
+          <div *ngIf="workout.items.length > 3" class="more-exercises">
+            +{{ workout.items.length - 3 }} exercícios
+          </div>
+        </div>
+        
+        <button class="btn-view-workout">Ver Treino Completo</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Seção de Treinos Privados -->
+  <div class="workout-section" *ngIf="getFilteredPrivateWorkouts().length > 0">
+    <h2 class="section-title">Treinos Privados</h2>
+    <div class="workouts-container">
+      <div 
+        *ngFor="let workout of getFilteredPrivateWorkouts()" 
+        class="workout-card"
+        (click)="openWorkoutModal(workout)"
+      >
+        <div class="workout-header">
+          <h3>{{ workout.name }}</h3>
+          <span class="workout-type private">Privado</span>
+        </div>
+        
+        <p class="workout-description">{{ workout.description }}</p>
+        
+        <div class="workout-stats">
+          <div class="stat">
+            <strong>{{ workout.items.length }}</strong> exercícios
+          </div>
+          <div class="stat">
+            <strong>{{ calculateTotalSets(workout) }}</strong> séries
+          </div>
+          <div class="stat">
+            <strong>{{ getMainMuscleGroups(workout) }}</strong>
+          </div>
+        </div>
+        
+        <div class="exercise-preview">
+          <div *ngFor="let item of workout.items.slice(0, 3)" class="exercise-item">
+            <span class="exercise-name">{{ item.exercise.name }}</span>
+            <span class="exercise-sets">{{ item.sets }}x{{ item.reps }}</span>
+          </div>
+          <div *ngIf="workout.items.length > 3" class="more-exercises">
+            +{{ workout.items.length - 3 }} exercícios
+          </div>
+        </div>
+        
+        <button class="btn-view-workout">Ver Treino Completo</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="no-results" *ngIf="getFilteredPublicWorkouts().length === 0 && getFilteredPrivateWorkouts().length === 0 && workoutSearch">
+    Nenhum treino encontrado para "{{ workoutSearch }}"
+  </div>
+
+  <div class="no-results" *ngIf="getAllWorkouts().length === 0 && !workoutSearch">
+    Nenhum treino disponível no momento.
+  </div>
+</div>
+
+<!-- Modal para criar treino -->
+<div class="modal-overlay" *ngIf="showCreateWorkoutModal" (click)="closeCreateWorkoutModal()">
+  <div class="modal-content create-workout-modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Criar Novo Treino Público</h2>
+      <button class="close-btn" (click)="closeCreateWorkoutModal()">&times;</button>
+    </div>
+    
+    <div class="modal-body">
+      <form (ngSubmit)="createWorkout()" #workoutForm="ngForm">
+        <div class="form-group">
+          <label for="workoutName">Nome do Treino</label>
+          <input 
+            type="text" 
+            id="workoutName"
+            class="form-input" 
+            [(ngModel)]="newWorkout.name"
+            name="workoutName"
+            required
+            placeholder="Digite o nome do treino"
+          >
+        </div>
+        
+        <div class="form-group">
+          <label for="workoutDescription">Descrição</label>
+          <textarea 
+            id="workoutDescription"
+            class="form-textarea" 
+            [(ngModel)]="newWorkout.description"
+            name="workoutDescription"
+            required
+            placeholder="Descreva o treino"
+            rows="3"
+          ></textarea>
+        </div>
+        
+        <div class="exercise-selection">
+          <h3>Selecionar Exercícios</h3>
+          
+          <div class="exercise-search">
+            <input 
+              type="text" 
+              class="search-input" 
+              placeholder="Buscar exercícios..."
+              [(ngModel)]="exerciseSearch"
+              name="exerciseSearch"
+            >
+          </div>
+          
+          <div class="available-exercises">
+            <h4>Exercícios Disponíveis</h4>
+            <div class="exercises-list">
+              <div 
+                *ngFor="let exercise of getFilteredExercises()" 
+                class="exercise-item selectable"
+                (click)="addExerciseToWorkout(exercise)"
+              >
+                <div class="exercise-info">
+                  <span class="exercise-name">{{ exercise.name }}</span>
+                  <span class="muscle-group">{{ exercise.muscleGroup | titlecase }}</span>
+                </div>
+                <button type="button" class="btn-add">+</button>
+              </div>
+            </div>
+          </div>
+          
+          <div class="selected-exercises" *ngIf="newWorkout.items.length > 0">
+            <h4>Exercícios Selecionados ({{ newWorkout.items.length }})</h4>
+            <div class="workout-exercises">
+              <div 
+                *ngFor="let item of newWorkout.items; let i = index" 
+                class="workout-exercise-item"
+              >
+                <div class="exercise-order">
+                  <button 
+                    type="button" 
+                    class="btn-order" 
+                    (click)="moveExercise(i, -1)"
+                    [disabled]="i === 0"
+                  >↑</button>
+                  <span class="order-number">{{ i + 1 }}</span>
+                  <button 
+                    type="button" 
+                    class="btn-order" 
+                    (click)="moveExercise(i, 1)"
+                    [disabled]="i === newWorkout.items.length - 1"
+                  >↓</button>
+                </div>
+                
+                <div class="exercise-details">
+                  <div class="exercise-name">{{ getExerciseById(item.exerciseId)?.name }}</div>
+                  <div class="exercise-params">
+                    <div class="param-group">
+                      <label>Séries:</label>
+                      <input 
+                        type="number" 
+                        min="1" 
+                        [(ngModel)]="item.sets"
+                        name="sets_{{i}}"
+                        class="param-input"
+                        required
+                      >
+                    </div>
+                    <div class="param-group">
+                      <label>Reps:</label>
+                      <input 
+                        type="text" 
+                        [(ngModel)]="item.reps"
+                        name="reps_{{i}}"
+                        class="param-input"
+                        placeholder="8-12"
+                        required
+                      >
+                    </div>
+                    <div class="param-group">
+                      <label>Descanso (s):</label>
+                      <input 
+                        type="number" 
+                        min="0" 
+                        [(ngModel)]="item.restSeconds"
+                        name="rest_{{i}}"
+                        class="param-input"
+                        required
+                      >
+                    </div>
+                  </div>
+                  <div class="observation-group">
+                    <label>Observação:</label>
+                    <input 
+                      type="text" 
+                      [(ngModel)]="item.observation"
+                      name="observation_{{i}}"
+                      class="param-input"
+                      placeholder="Observações opcionais"
+                    >
+                  </div>
+                </div>
+                
+                <button 
+                  type="button" 
+                  class="btn-remove" 
+                  (click)="removeExerciseFromWorkout(i)"
+                >×</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="modal-actions">
+          <button 
+            type="button" 
+            class="btn-cancel" 
+            (click)="closeCreateWorkoutModal()"
+          >
+            Cancelar
+          </button>
+          <button 
+            type="submit" 
+            class="btn-create" 
+            [disabled]="!workoutForm.valid || newWorkout.items.length === 0"
+          >
+            Criar Treino
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para exibir detalhes do treino -->
+<div class="modal-overlay" *ngIf="selectedWorkout" (click)="closeWorkoutModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>{{ selectedWorkout.name }}</h2>
+      <button class="close-btn" (click)="closeWorkoutModal()">&times;</button>
+    </div>
+    
+    <div class="modal-body">
+      <div class="workout-overview">
+        <p class="workout-description">{{ selectedWorkout.description }}</p>
+        
+        <div class="workout-summary">
+          <div class="summary-item">
+            <strong>Total de exercícios:</strong> {{ selectedWorkout.items.length }}
+          </div>
+          <div class="summary-item">
+            <strong>Total de séries:</strong> {{ calculateTotalSets(selectedWorkout) }}
+          </div>
+          <div class="summary-item">
+            <strong>Grupos musculares:</strong> {{ getMainMuscleGroups(selectedWorkout) }}
+          </div>
+          <div class="summary-item">
+            <strong>Tempo estimado:</strong> {{ calculateEstimatedTime(selectedWorkout) }} min
+          </div>
+        </div>
+      </div>
+
+      <h3>Exercícios do Treino</h3>
+      
+      <div class="exercises-list">
+        <div *ngFor="let item of selectedWorkout.items" class="exercise-detail">
+          <div class="exercise-header">
+            <span class="exercise-order">{{ item.order }}</span>
+            <div class="exercise-info">
+              <h4>{{ item.exercise.name }}</h4>
+              <p class="muscle-group">{{ item.exercise.muscleGroup | titlecase }}</p>
+            </div>
+          </div>
+          
+          <div class="exercise-images" *ngIf="item.exercise.mediaUrl || item.exercise.mediaUrl2">
+            <img 
+              *ngIf="item.exercise.mediaUrl" 
+              [src]="item.exercise.mediaUrl" 
+              [alt]="item.exercise.name + ' - posição inicial'"
+              class="exercise-image"
+            >
+            <img 
+              *ngIf="item.exercise.mediaUrl2" 
+              [src]="item.exercise.mediaUrl2" 
+              [alt]="item.exercise.name + ' - execução'"
+              class="exercise-image"
+            >
+          </div>
+          
+          <div class="exercise-specs">
+            <div class="spec">
+              <strong>Séries:</strong> {{ item.sets }}
+            </div>
+            <div class="spec">
+              <strong>Repetições:</strong> {{ item.reps }}
+            </div>
+            <div class="spec">
+              <strong>Descanso:</strong> {{ item.restSeconds }}s
+            </div>
+            <div class="spec">
+              <strong>Equipamento:</strong> {{ item.exercise.equipment }}
+            </div>
+          </div>
+          
+          <div class="exercise-description">
+            <p><strong>Descrição:</strong> {{ item.exercise.description }}</p>
+          </div>
+          
+          <div class="exercise-observation" *ngIf="item.observation">
+            <p><strong>Observação:</strong> {{ item.observation }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

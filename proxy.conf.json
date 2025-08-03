@@ -14,6 +14,16 @@
     "secure": false,
     "changeOrigin": true
   },
+  "/api/v1/workouts": {
+    "target": "http://localhost:8082",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/api/v1/exercises": {
+    "target": "http://localhost:8082",
+    "secure": false,
+    "changeOrigin": true
+  },
   "/auth/password-reset/request":{
     "target": "http://localhost:8080",
     "secure": false,

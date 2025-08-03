@@ -1,0 +1,962 @@
+.page-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  padding: 80px 20px 40px;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+.page-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  max-width: 1200px;
+  margin-bottom: 32px;
+  text-align: center;
+  
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: 16px;
+  }
+}
+
+.page-title {
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  font-weight: 700;
+  color: #2c3e50;
+  margin: 0;
+  
+  &::after {
+    content: '';
+    display: block;
+    width: 60px;
+    height: 3px;
+    background: linear-gradient(135deg, #1F3A26 0%, #2d4f36 100%);
+    border-radius: 2px;
+    margin: 8px auto 0;
+  }
+}
+
+.filter-container {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  justify-content: center;
+  width: 100%;
+  max-width: 600px;
+  
+  @media (max-width: 768px) {
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+}
+
+.search-input {
+  padding: 12px 16px;
+  border: 2px solid rgba(31, 58, 38, 0.1);
+  border-radius: 12px;
+  font-size: 0.9rem;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(10px);
+  flex: 1;
+  min-width: 250px;
+  max-width: 100%;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  box-sizing: border-box;
+  
+  @media (max-width: 768px) {
+    min-width: unset;
+    width: 100%;
+  }
+  
+  &:focus {
+    outline: none;
+    border-color: #1F3A26;
+    box-shadow: 
+      0 0 0 4px rgba(31, 58, 38, 0.1),
+      0 4px 12px rgba(31, 58, 38, 0.1);
+    transform: translateY(-2px);
+  }
+  
+  &:hover {
+    border-color: rgba(31, 58, 38, 0.2);
+    transform: translateY(-1px);
+  }
+  
+  &::placeholder {
+    color: #999;
+    transition: color 0.3s ease;
+  }
+  
+  &:focus::placeholder {
+    color: #ccc;
+  }
+}
+
+.workouts-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 24px;
+  margin-top: 20px;
+  width: 100%;
+  max-width: 1400px;
+  
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: 16px;
+    align-items: flex-start;
+  }
+}
+
+.section-title {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #1F3A26;
+  margin: 0;
+}
+
+.workout-section {
+  width: 100%;
+  max-width: 1400px;
+  margin-bottom: 40px;
+}
+
+.workout-card {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.08),
+    0 4px 16px rgba(0, 0, 0, 0.04);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #1F3A26 0%, #2d4f36 50%, #1F3A26 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  &:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 
+      0 20px 60px rgba(0, 0, 0, 0.15),
+      0 8px 24px rgba(0, 0, 0, 0.08);
+    border-color: rgba(31, 58, 38, 0.2);
+    
+    &::before {
+      opacity: 1;
+    }
+  }
+}
+
+.workout-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+  gap: 12px;
+
+  h3 {
+    margin: 0;
+    background: linear-gradient(135deg, #1F3A26 0%, #2d4f36 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-size: 1.3rem;
+    font-weight: 700;
+    flex: 1;
+    line-height: 1.3;
+  }
+}
+
+.workout-type {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  
+  &.public {
+    background: rgba(34, 197, 94, 0.1);
+    color: #16a34a;
+    border: 1px solid rgba(34, 197, 94, 0.2);
+  }
+  
+  &.private {
+    background: rgba(239, 68, 68, 0.1);
+    color: #dc2626;
+    border: 1px solid rgba(239, 68, 68, 0.2);
+  }
+}
+
+.workout-description {
+  color: #666;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin-bottom: 20px;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.workout-stats {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  padding: 16px;
+  background: rgba(31, 58, 38, 0.02);
+  border-radius: 12px;
+  border: 1px solid rgba(31, 58, 38, 0.05);
+  
+  @media (max-width: 480px) {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .stat {
+    text-align: center;
+    
+    @media (max-width: 480px) {
+      text-align: left;
+    }
+
+    strong {
+      display: block;
+      font-size: 1.1rem;
+      background: linear-gradient(135deg, #1F3A26 0%, #2d4f36 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-weight: 700;
+    }
+  }
+}
+
+.exercise-preview {
+  margin-bottom: 20px;
+
+  .exercise-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(224, 224, 224, 0.3);
+    font-size: 0.9rem;
+
+    .exercise-name {
+      color: #333;
+      flex: 1;
+      margin-right: 12px;
+    }
+
+    .exercise-sets {
+      color: #1F3A26;
+      font-weight: 600;
+      font-size: 0.85rem;
+    }
+  }
+
+  .more-exercises {
+    padding: 8px 0;
+    color: #999;
+    font-style: italic;
+    font-size: 0.85rem;
+    text-align: center;
+  }
+}
+
+.btn-view-workout {
+  background: linear-gradient(135deg, #1F3A26 0%, #2d4f36 100%);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  width: 100%;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  font-size: 0.95rem;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s;
+  }
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(31, 58, 38, 0.3);
+  }
+
+  &:hover::before {
+    left: 100%;
+  }
+}
+
+.no-results {
+  text-align: center;
+  color: #999;
+  font-style: italic;
+  margin-top: 40px;
+  grid-column: 1 / -1;
+  font-size: 1.1rem;
+  padding: 40px;
+}
+
+// Modal Styles
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+.modal-content {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 20px;
+  max-width: 800px;
+  width: 100%;
+  max-height: calc(100vh - 32px);
+  overflow-y: auto;
+  box-shadow: 
+    0 25px 80px rgba(0, 0, 0, 0.25),
+    0 10px 40px rgba(0, 0, 0, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  
+  @media (max-width: 768px) {
+    max-height: calc(100vh - 16px);
+    border-radius: 16px;
+  }
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px;
+  border-bottom: 1px solid rgba(224, 224, 224, 0.3);
+  position: sticky;
+  top: 0;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  z-index: 10;
+
+  h2 {
+    margin: 0;
+    background: linear-gradient(135deg, #1F3A26 0%, #2d4f36 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-size: 1.5rem;
+    font-weight: 700;
+  }
+
+  .close-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(224, 224, 224, 0.2);
+    font-size: 20px;
+    cursor: pointer;
+    color: #666;
+    padding: 0;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+
+    &:hover {
+      background: rgba(31, 58, 38, 0.1);
+      border-color: rgba(31, 58, 38, 0.2);
+      color: #1F3A26;
+      transform: scale(1.1);
+    }
+  }
+}
+
+.modal-body {
+  padding: 24px;
+
+  h3 {
+    background: linear-gradient(135deg, #1F3A26 0%, #2d4f36 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin: 32px 0 20px 0;
+    border-bottom: 2px solid rgba(31, 58, 38, 0.1);
+    padding-bottom: 12px;
+
+    &:first-child {
+      margin-top: 0;
+    }
+  }
+}
+
+.workout-overview {
+  margin-bottom: 32px;
+
+  .workout-description {
+    font-size: 1rem;
+    line-height: 1.7;
+    color: #555;
+    margin-bottom: 24px;
+  }
+}
+
+.workout-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  padding: 20px;
+  background: rgba(31, 58, 38, 0.02);
+  border-radius: 12px;
+  border: 1px solid rgba(31, 58, 38, 0.1);
+
+  .summary-item {
+    text-align: center;
+
+    @media (max-width: 640px) {
+      text-align: left;
+    }
+
+    strong {
+      display: block;
+      background: linear-gradient(135deg, #1F3A26 0%, #2d4f36 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+  }
+}
+
+.exercises-list {
+  &.modal-exercises {
+    max-height: 300px;
+    overflow-y: auto;
+    border: 1px solid rgba(31, 58, 38, 0.1);
+    border-radius: 8px;
+    padding: 12px;
+  }
+  
+  &.detail-exercises {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+}
+
+.exercise-detail {
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(224, 224, 224, 0.3);
+  border-radius: 16px;
+  padding: 24px;
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  }
+}
+
+.exercise-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+
+  .exercise-order {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background: linear-gradient(135deg, #1F3A26 0%, #2d4f36 100%);
+    color: white;
+    border-radius: 50%;
+    font-weight: 700;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+  }
+
+  .exercise-info {
+    flex: 1;
+
+    h4 {
+      margin: 0 0 4px 0;
+      color: #2c3e50;
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    .muscle-group {
+      margin: 0;
+      color: #1F3A26;
+      font-size: 0.85rem;
+      font-weight: 500;
+      background: rgba(31, 58, 38, 0.1);
+      padding: 2px 8px;
+      border-radius: 12px;
+      display: inline-block;
+    }
+  }
+}
+
+.exercise-images {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+  justify-content: center;
+
+  @media (max-width: 640px) {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .exercise-image {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 12px;
+    border: 2px solid rgba(31, 58, 38, 0.1);
+    transition: all 0.3s ease;
+
+    &:hover {
+      transform: scale(1.05);
+      border-color: #1F3A26;
+    }
+
+    @media (max-width: 640px) {
+      width: 200px;
+      height: 200px;
+    }
+  }
+}
+
+.exercise-specs {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+  padding: 16px;
+  background: rgba(31, 58, 38, 0.02);
+  border-radius: 10px;
+
+  .spec {
+    text-align: center;
+    font-size: 0.9rem;
+
+    @media (max-width: 640px) {
+      text-align: left;
+    }
+
+    strong {
+      display: block;
+      color: #1F3A26;
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+  }
+}
+
+.exercise-description {
+  margin-bottom: 12px;
+
+  p {
+    color: #555;
+    line-height: 1.6;
+    font-size: 0.95rem;
+    margin: 0;
+
+    strong {
+      color: #1F3A26;
+    }
+  }
+}
+
+.exercise-observation {
+  padding: 12px;
+  background: rgba(34, 197, 94, 0.02);
+  border: 1px solid rgba(34, 197, 94, 0.1);
+  border-radius: 8px;
+
+  p {
+    color: #16a34a;
+    margin: 0;
+    font-size: 0.9rem;
+    font-style: italic;
+
+    strong {
+      color: #15803d;
+    }
+  }
+}
+
+.btn-create-workout {
+  background: linear-gradient(135deg, #1F3A26 0%, #2d4f36 100%);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(31, 58, 38, 0.3);
+  }
+}
+
+.create-workout-modal {
+  max-width: 900px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.form-group {
+  margin-bottom: 20px;
+  
+  label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #333;
+  }
+}
+
+.form-input, .form-textarea {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid rgba(31, 58, 38, 0.1);
+  border-radius: 8px;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+  
+  &:focus {
+    outline: none;
+    border-color: #1F3A26;
+    box-shadow: 0 0 0 4px rgba(31, 58, 38, 0.1);
+  }
+}
+
+.exercise-selection h3 {
+  color: #1F3A26;
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin: 20px 0 16px 0;
+}
+
+.exercise-search {
+  margin-bottom: 16px;
+}
+
+.available-exercises h4 {
+  color: #1F3A26;
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.exercise-item.selectable {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  border: 1px solid rgba(31, 58, 38, 0.1);
+  border-radius: 8px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    background: rgba(31, 58, 38, 0.05);
+    border-color: #1F3A26;
+  }
+}
+
+.exercise-info {
+  flex: 1;
+  
+  .exercise-name {
+    font-weight: 600;
+    color: #1F3A26;
+    display: block;
+    margin-bottom: 4px;
+  }
+  
+  .muscle-group {
+    background: rgba(31, 58, 38, 0.1);
+    color: #1F3A26;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 500;
+  }
+}
+
+.btn-add {
+  background: #1F3A26;
+  color: white;
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    background: #2d4f36;
+  }
+}
+
+.selected-exercises h4 {
+  color: #1F3A26;
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 20px 0 12px 0;
+}
+
+.workout-exercises {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.workout-exercise-item {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 16px;
+  align-items: center;
+  padding: 16px;
+  border: 1px solid rgba(31, 58, 38, 0.1);
+  border-radius: 8px;
+  margin-bottom: 12px;
+  background: rgba(255, 255, 255, 0.8);
+  
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
+
+.exercise-order {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.order-number {
+  background: #1F3A26;
+  color: white;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+}
+
+.btn-order {
+  background: rgba(31, 58, 38, 0.1);
+  border: 1px solid rgba(31, 58, 38, 0.2);
+  color: #1F3A26;
+  width: 24px;
+  height: 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: all 0.3s ease;
+  
+  &:hover:not(:disabled) {
+    background: rgba(31, 58, 38, 0.2);
+  }
+  
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.exercise-details {
+  flex: 1;
+  
+  .exercise-name {
+    font-weight: 600;
+    color: #1F3A26;
+    margin-bottom: 8px;
+    display: block;
+  }
+}
+
+.exercise-params {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+.param-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  
+  label {
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: #666;
+    margin-bottom: 2px;
+  }
+}
+
+.param-input {
+  width: 80px;
+  padding: 6px 8px;
+  border: 1px solid rgba(31, 58, 38, 0.2);
+  border-radius: 6px;
+  font-size: 0.9rem;
+  text-align: center;
+  
+  &:focus {
+    outline: none;
+    border-color: #1F3A26;
+  }
+}
+
+.observation-group {
+  margin-top: 8px;
+  
+  label {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: #666;
+    margin-bottom: 4px;
+  }
+  
+  .param-input {
+    width: 100%;
+    text-align: left;
+  }
+}
+
+.btn-remove {
+  background: rgba(239, 68, 68, 0.1);
+  color: #dc2626;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    background: rgba(239, 68, 68, 0.2);
+  }
+}
+
+.modal-actions {
+  display: flex;
+  gap: 16px;
+  justify-content: flex-end;
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(31, 58, 38, 0.1);
+}
+
+.btn-cancel {
+  background: #f3f4f6;
+  color: #374151;
+  border: 1px solid #d1d5db;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    background: #e5e7eb;
+  }
+}
+
+.btn-create {
+  background: linear-gradient(135deg, #1F3A26 0%, #2d4f36 100%);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(31, 58, 38, 0.3);
+  }
+  
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+  }
+}
+
