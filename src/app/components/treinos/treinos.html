@@ -60,10 +60,10 @@
           </button>
           <div class="workout-secondary-actions">
             <button class="btn-edit-workout" (click)="openEditWorkoutModal(workout); $event.stopPropagation()">
-              ✏️ Editar
+              <img src="edit.svg" alt="Editar" width="16" height="16"> Editar
             </button>
             <button class="btn-delete-workout" (click)="deleteWorkout(workout.id, workout.name); $event.stopPropagation()">
-              🗑️ Deletar
+              <img src="delete.svg" alt="Deletar" width="16" height="16"> Deletar
             </button>
           </div>
         </div>
@@ -73,7 +73,12 @@
 
   <!-- Seção de Treinos Privados -->
   <div class="workout-section" *ngIf="getFilteredPrivateWorkouts().length > 0">
-    <h2 class="section-title">Treinos Privados</h2>
+    <div class="section-header">
+      <h2 class="section-title">Treinos Privados</h2>
+      <button class="btn-create-workout" (click)="openCreatePrivateWorkoutModal()">
+        Criar Treino Privado
+      </button>
+    </div>
     <div class="workouts-container">
       <div 
         *ngFor="let workout of getFilteredPrivateWorkouts()" 
@@ -96,6 +101,25 @@
           <div class="stat">
             <strong>{{ getMainMuscleGroups(workout) }}</strong>
           </div>
+          <div class="stat">
+            <strong>{{ workout.studentIds.length }}</strong> aluno(s)
+          </div>
+        </div>
+
+        <!-- Seção dos alunos com acesso -->
+        <div class="workout-students" *ngIf="workout.studentIds.length > 0">
+          <h4>Alunos com acesso:</h4>
+          <div class="students-list">
+            <span 
+              *ngFor="let studentId of workout.studentIds.slice(0, 3)" 
+              class="student-name"
+            >
+              {{ getStudentById(studentId)?.name || 'Nome não encontrado' }}
+            </span>
+            <span *ngIf="workout.studentIds.length > 3" class="more-students">
+              +{{ workout.studentIds.length - 3 }} aluno(s)
+            </span>
+          </div>
         </div>
         
         <div class="exercise-preview">
@@ -113,15 +137,31 @@
             Ver Treino Completo
           </button>
           <div class="workout-secondary-actions">
+            <button class="btn-manage-students" (click)="openStudentManagementModal(workout); $event.stopPropagation()">
+              Alunos
+            </button>
             <button class="btn-edit-workout" (click)="openEditWorkoutModal(workout); $event.stopPropagation()">
-              ✏️ Editar
+              <img src="edit.svg" alt="Editar" width="16" height="16"> Editar
             </button>
             <button class="btn-delete-workout" (click)="deleteWorkout(workout.id, workout.name); $event.stopPropagation()">
-              🗑️ Deletar
+              <img src="delete.svg" alt="Deletar" width="16" height="16"> Deletar
             </button>
           </div>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- Seção de Treinos Privados quando não há treinos -->
+  <div class="workout-section" *ngIf="getFilteredPrivateWorkouts().length === 0 && !workoutSearch">
+    <div class="section-header">
+      <h2 class="section-title">Treinos Privados</h2>
+      <button class="btn-create-workout" (click)="openCreatePrivateWorkoutModal()">
+        Criar Treino Privado
+      </button>
+    </div>
+    <div class="no-results">
+      Nenhum treino privado disponível no momento.
     </div>
   </div>
 
@@ -333,10 +373,10 @@
 
       <div class="modal-workout-actions">
         <button class="btn-edit-workout-modal" (click)="openEditWorkoutModal(selectedWorkout!)">
-          ✏️ Editar Treino
+          <img src="edit.svg" alt="Editar" width="16" height="16"> Editar Treino
         </button>
         <button class="btn-delete-workout-modal" (click)="deleteWorkout(selectedWorkout.id, selectedWorkout.name)">
-          🗑️ Deletar Treino
+          <img src="delete.svg" alt="Deletar" width="16" height="16"> Deletar Treino
         </button>
       </div>
 
@@ -391,6 +431,204 @@
           </div>
         </div>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para criar treino privado -->
+<div class="modal-overlay" *ngIf="showCreatePrivateWorkoutModal" (click)="closeCreatePrivateWorkoutModal()">
+  <div class="modal-content create-workout-modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Criar Novo Treino Privado</h2>
+      <button class="close-btn" (click)="closeCreatePrivateWorkoutModal()">&times;</button>
+    </div>
+    
+    <div class="modal-body">
+      <form (ngSubmit)="createPrivateWorkout()" #privateWorkoutForm="ngForm">
+        <div class="form-group">
+          <label for="privateWorkoutName">Nome do Treino</label>
+          <input 
+            type="text" 
+            id="privateWorkoutName"
+            class="form-input" 
+            [(ngModel)]="newPrivateWorkout.name"
+            name="privateWorkoutName"
+            required
+            placeholder="Digite o nome do treino"
+          >
+        </div>
+        
+        <div class="form-group">
+          <label for="privateWorkoutDescription">Descrição</label>
+          <textarea 
+            id="privateWorkoutDescription"
+            class="form-textarea" 
+            [(ngModel)]="newPrivateWorkout.description"
+            name="privateWorkoutDescription"
+            required
+            placeholder="Descreva o treino"
+            rows="3"
+          ></textarea>
+        </div>
+
+        <div class="student-selection">
+          <h3>Selecionar Alunos <span class="required-indicator">(obrigatório - mínimo 1)</span></h3>
+          
+          <div class="student-search">
+            <input 
+              type="text" 
+              class="search-input" 
+              placeholder="Buscar alunos por nome, CPF ou email..."
+              [(ngModel)]="studentSearch"
+              name="studentSearch"
+            >
+          </div>
+
+          <!-- Lista de alunos selecionados -->
+          <div class="selected-students" *ngIf="getSelectedStudentsForPrivateWorkout().length > 0">
+            <h4>Alunos Selecionados ({{ getSelectedStudentsForPrivateWorkout().length }})</h4>
+            <div class="students-list-modal">
+              <div 
+                *ngFor="let student of getSelectedStudentsForPrivateWorkout()" 
+                class="student-item"
+              >
+                <div class="student-info">
+                  <div class="student-name">{{ student.name }}</div>
+                  <div class="student-details">{{ student.cpf }} • {{ student.email }}</div>
+                  <div class="student-plan">{{ student.planType }} - {{ student.planDescription }}</div>
+                </div>
+                <button 
+                  type="button" 
+                  class="btn-remove-student" 
+                  (click)="removeStudentFromPrivateWorkout(student.id)"
+                  title="Remover aluno"
+                >
+                  ×
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Lista de alunos disponíveis -->
+          <div class="available-students">
+            <h4>Alunos Disponíveis</h4>
+            <div class="students-list-modal" *ngIf="getAvailableStudentsForPrivateWorkout().length > 0">
+              <div 
+                *ngFor="let student of getAvailableStudentsForPrivateWorkout()" 
+                class="student-item selectable"
+                (click)="addStudentToPrivateWorkout(student.id)"
+              >
+                <div class="student-info">
+                  <div class="student-name">{{ student.name }}</div>
+                  <div class="student-details">{{ student.cpf }} • {{ student.email }}</div>
+                  <div class="student-plan">{{ student.planType }} - {{ student.planDescription }}</div>
+                </div>
+                <button type="button" class="btn-add-student">+</button>
+              </div>
+            </div>
+            <div class="no-results" *ngIf="getAvailableStudentsForPrivateWorkout().length === 0">
+              <span *ngIf="!studentSearch">Todos os alunos já foram selecionados</span>
+              <span *ngIf="studentSearch">Nenhum aluno encontrado para "{{ studentSearch }}"</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="exercise-selection">
+          <h3>Selecionar Exercícios</h3>
+          
+          <div class="exercise-search">
+            <input 
+              type="text" 
+              class="search-input" 
+              placeholder="Buscar exercícios..."
+              [(ngModel)]="exerciseSearch"
+              name="exerciseSearch"
+            >
+          </div>
+          
+          <div class="exercises-list">
+            <div 
+              *ngFor="let exercise of getFilteredExercises()" 
+              class="exercise-item"
+              (click)="addExerciseToPrivateWorkout(exercise)"
+            >
+              <div class="exercise-info">
+                <h4>{{ exercise.name }}</h4>
+                <p>{{ exercise.muscleGroup }}</p>
+              </div>
+              <button type="button" class="btn-add-exercise">+</button>
+            </div>
+          </div>
+        </div>
+        
+        <div class="selected-exercises" *ngIf="newPrivateWorkout.items.length > 0">
+          <h3>Exercícios Selecionados</h3>
+          <div class="exercise-list">
+            <div *ngFor="let item of newPrivateWorkout.items; let i = index" class="exercise-config">
+              <div class="exercise-header">
+                <h4>{{ getExerciseById(item.exerciseId)?.name }}</h4>
+                <button type="button" class="btn-remove" (click)="removeExerciseFromPrivateWorkout(i)">✕</button>
+              </div>
+              
+              <div class="exercise-params">
+                <div class="param-group">
+                  <label>Séries</label>
+                  <input 
+                    type="text" 
+                    class="param-input" 
+                    [(ngModel)]="item.sets"
+                    [name]="'sets_' + i"
+                  >
+                </div>
+                
+                <div class="param-group">
+                  <label>Repetições</label>
+                  <input 
+                    type="text" 
+                    class="param-input" 
+                    [(ngModel)]="item.reps"
+                    [name]="'reps_' + i"
+                  >
+                </div>
+                
+                <div class="param-group">
+                  <label>Descanso (seg)</label>
+                  <input 
+                    type="number" 
+                    class="param-input" 
+                    [(ngModel)]="item.restSeconds"
+                    [name]="'rest_' + i"
+                  >
+                </div>
+              </div>
+              
+              <div class="param-group full-width">
+                <label>Observação</label>
+                <input 
+                  type="text" 
+                  class="param-input" 
+                  [(ngModel)]="item.observation"
+                  [name]="'obs_' + i"
+                  placeholder="Observações opcionais"
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="modal-footer">
+          <button type="button" class="btn-cancel" (click)="closeCreatePrivateWorkoutModal()">
+            Cancelar
+          </button>
+          <button 
+            type="submit" 
+            class="btn-confirm"
+            [disabled]="!privateWorkoutForm.form.valid || newPrivateWorkout.items.length === 0 || tempSelectedStudentIds.length === 0"
+          >
+            Criar Treino Privado
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 </div>
@@ -560,6 +798,96 @@
           </button>
         </div>
       </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para gerenciar alunos do treino -->
+<div class="modal-overlay" *ngIf="showStudentManagementModal" (click)="closeStudentManagementModal()">
+  <div class="modal-content student-management-modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Gerenciar Alunos - {{ selectedWorkoutForStudents?.name }}</h2>
+      <button class="close-btn" (click)="closeStudentManagementModal()">&times;</button>
+    </div>
+    
+    <div class="modal-body" *ngIf="selectedWorkoutForStudents">
+      <!-- Alunos com acesso ao treino -->
+      <div class="students-with-access" *ngIf="getTempStudentsFromWorkout().length > 0">
+        <h3>Alunos com acesso ({{ getTempStudentsFromWorkout().length }})</h3>
+        <div class="students-list-modal">
+          <div 
+            *ngFor="let student of getTempStudentsFromWorkout()" 
+            class="student-item"
+          >
+            <div class="student-info">
+              <div class="student-name">{{ student.name }}</div>
+              <div class="student-details">{{ student.cpf }} • {{ student.email }}</div>
+            </div>
+            <button 
+              class="btn-remove-student" 
+              (click)="removeStudentFromWorkout(student.id)"
+              title="Remover aluno do treino"
+            >
+              ×
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Buscar e adicionar alunos -->
+      <div class="add-students-section">
+        <h3>Adicionar Alunos</h3>
+        
+        <div class="student-search">
+          <input 
+            type="text" 
+            class="search-input" 
+            placeholder="Buscar alunos por nome, CPF ou email..."
+            [(ngModel)]="studentSearch"
+          >
+        </div>
+        
+        <div class="available-students" *ngIf="getAvailableStudents(selectedWorkoutForStudents).length > 0">
+          <h4>Alunos disponíveis ({{ getAvailableStudents(selectedWorkoutForStudents).length }})</h4>
+          <div class="students-list-modal">
+            <div 
+              *ngFor="let student of getAvailableStudents(selectedWorkoutForStudents)" 
+              class="student-item selectable"
+              (click)="addStudentToWorkout(student.id)"
+            >
+              <div class="student-info">
+                <div class="student-name">{{ student.name }}</div>
+                <div class="student-details">{{ student.cpf }} • {{ student.email }}</div>
+                <div class="student-plan">{{ student.planType }} - {{ student.planDescription }}</div>
+              </div>
+              <button type="button" class="btn-add-student">+</button>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="getAvailableStudents(selectedWorkoutForStudents).length === 0" class="no-students">
+          <p *ngIf="studentSearch">Nenhum aluno encontrado para "{{ studentSearch }}"</p>
+          <p *ngIf="!studentSearch">Todos os alunos já têm acesso a este treino.</p>
+        </div>
+      </div>
+
+      <!-- Botões de ação do modal -->
+      <div class="modal-actions">
+        <button 
+          type="button" 
+          class="btn-cancel" 
+          (click)="closeStudentManagementModal()"
+        >
+          Cancelar
+        </button>
+        <button 
+          type="button" 
+          class="btn-confirm" 
+          (click)="confirmStudentChanges()"
+        >
+          Confirmar Alterações
+        </button>
+      </div>
     </div>
   </div>
 </div>

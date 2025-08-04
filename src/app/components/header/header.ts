@@ -1,7 +1,7 @@
-import { Component, inject, OnInit, ViewChild, ElementRef, AfterViewInit, HostListener } from '@angular/core';
+import { Component, inject, OnInit, ViewChild, ElementRef, AfterViewInit, HostListener, PLATFORM_ID, Inject } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
 import { AuthService, User } from '../../services/auth.service';
-import { CommonModule } from '@angular/common';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { Observable } from 'rxjs';
 import { filter } from 'rxjs/operators';
 
@@ -24,6 +24,8 @@ export class Header implements OnInit, AfterViewInit {
   public activeRoute: string = 'dashboards';
   public isMenuVisible: boolean = false;
   private screenWidth: number = 0;
+
+  constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
   
   ngOnInit(): void {
     
@@ -35,8 +37,9 @@ export class Header implements OnInit, AfterViewInit {
     
     this.updateActiveRoute(this.router.url);
     
-    // Armazena a largura inicial da tela
-    this.screenWidth = window.innerWidth;
+    if (isPlatformBrowser(this.platformId)) {
+      this.screenWidth = window.innerWidth;
+    }
   }
 
   ngAfterViewInit(): void {
@@ -44,7 +47,7 @@ export class Header implements OnInit, AfterViewInit {
   }
 
   public checkMenuDisplay(): void {
-    if (this.menuAuth) {
+    if (isPlatformBrowser(this.platformId) && this.menuAuth) {
       const element = this.menuAuth.nativeElement;
       const computedStyle = window.getComputedStyle(element);
       

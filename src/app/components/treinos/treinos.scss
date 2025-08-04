@@ -30,6 +30,7 @@
   font-weight: 700;
   color: #2c3e50;
   margin: 0;
+  animation: fadeInUp 0.6s ease-out ;
   
   &::after {
     content: '';
@@ -70,6 +71,7 @@
   transition: all 0.3s ease;
   font-weight: 500;
   box-sizing: border-box;
+  animation: fadeInUp 0.6s ease-out ;
   
   @media (max-width: 768px) {
     min-width: unset;
@@ -107,6 +109,7 @@
   margin-top: 20px;
   width: 100%;
   max-width: 1400px;
+  animation: fadeInUp 0.6s ease-out ;
   
   @media (max-width: 768px) {
     grid-template-columns: 1fr;
@@ -119,6 +122,7 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
+  animation: fadeInUp 0.6s ease-out ;
   
   @media (max-width: 768px) {
     flex-direction: column;
@@ -234,16 +238,18 @@
 
 .workout-stats {
   display: flex;
-  justify-content: space-between;
+  justify-content: space-around;
+  align-items: center;
   margin-bottom: 20px;
   padding: 16px;
   background: rgba(31, 58, 38, 0.02);
   border-radius: 12px;
   border: 1px solid rgba(31, 58, 38, 0.05);
+  gap: 16px;
   
   @media (max-width: 480px) {
     flex-direction: column;
-    gap: 8px;
+    gap: 12px;
   }
 
   .stat {
@@ -261,6 +267,12 @@
       -webkit-text-fill-color: transparent;
       background-clip: text;
       font-weight: 700;
+      margin-bottom: 4px;
+    }
+    
+    /* Adiciona espaço entre o número e o texto */
+    &:not(:last-child) {
+      margin-right: 8px;
     }
   }
 }
@@ -337,16 +349,35 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
-  align-items: stretch;
+  align-items: center;
+  justify-content: center;
 }
 
 .workout-secondary-actions {
   display: flex;
-  gap: 12px;
+  gap: 8px;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  flex-wrap: wrap;
   
   .btn-edit-workout,
-  .btn-delete-workout {
+  .btn-delete-workout,
+  .btn-manage-students {
     flex: 1;
+    min-width: 120px;
+  }
+
+  @media (max-width: 480px) {
+    flex-direction: column;
+    gap: 8px;
+    
+    .btn-edit-workout,
+    .btn-delete-workout,
+    .btn-manage-students {
+      width: 100%;
+      flex: none;
+    }
   }
 }
 
@@ -363,6 +394,14 @@
   white-space: nowrap;
   position: relative;
   overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  img {
+    filter: brightness(0) invert(1);
+  }
 
   &::before {
     content: '';
@@ -399,6 +438,14 @@
   white-space: nowrap;
   position: relative;
   overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  img {
+    filter: brightness(0) invert(1);
+  }
 
   &::before {
     content: '';
@@ -591,7 +638,7 @@
 }
 
 .btn-edit-workout-modal {
-  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  background: linear-gradient(135deg, #444444 0%, #333333 100%);
   color: white;
   border: none;
   padding: 14px 28px;
@@ -602,6 +649,13 @@
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  img {
+    filter: brightness(0) invert(1);
+  }
 
   &::before {
     content: '';
@@ -637,6 +691,13 @@
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  img {
+    filter: brightness(0) invert(1);
+  }
 
   &::before {
     content: '';
@@ -832,6 +893,7 @@
   font-weight: 600;
   font-size: 1rem;
   transition: all 0.3s ease;
+  animation: fadeInUp 0.6s ease-out ;
   
   &:hover {
     transform: translateY(-2px);
@@ -1156,3 +1218,436 @@
   }
 }
 
+// Student Management Styles
+.workout-students {
+  margin-bottom: 16px;
+  padding: 12px;
+  background: rgba(31, 58, 38, 0.02);
+  border-radius: 8px;
+  border: 1px solid rgba(31, 58, 38, 0.05);
+
+  h4 {
+    margin: 0 0 8px 0;
+    color: #1F3A26;
+    font-size: 0.9rem;
+    font-weight: 600;
+  }
+
+  .students-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+
+    .student-name {
+      background: rgba(31, 58, 38, 0.1);
+      color: #1F3A26;
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
+
+    .more-students {
+      background: rgba(31, 58, 38, 0.05);
+      color: #666;
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 0.8rem;
+      font-style: italic;
+    }
+  }
+}
+
+.btn-manage-students {
+  background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  font-size: 0.9rem;
+  white-space: nowrap;
+  position: relative;
+  overflow: hidden;
+  flex: 1;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s;
+  }
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(139, 92, 246, 0.3);
+    background: linear-gradient(135deg, #a78bfa 0%, #8b5cf6 100%);
+  }
+
+  &:hover::before {
+    left: 100%;
+  }
+}
+
+// Student Management Modal Styles
+.student-management-modal {
+  max-width: 800px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.students-with-access {
+  margin-bottom: 32px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid rgba(31, 58, 38, 0.1);
+
+  h3 {
+    color: #1F3A26;
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin: 0 0 16px 0;
+  }
+}
+
+.add-students-section {
+  h3 {
+    color: #1F3A26;
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin: 0 0 16px 0;
+  }
+
+  h4 {
+    color: #1F3A26;
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 16px 0 12px 0;
+  }
+}
+
+.student-search {
+  margin-bottom: 20px;
+}
+
+.student-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  border-bottom: 1px solid rgba(31, 58, 38, 0.05);
+  transition: all 0.3s ease;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &.selectable {
+    cursor: pointer;
+
+    &:hover {
+      background: rgba(31, 58, 38, 0.02);
+    }
+  }
+
+  .student-info {
+    flex: 1;
+
+    .student-name {
+      font-weight: 600;
+      color: #1F3A26;
+      margin-bottom: 4px;
+      font-size: 1rem;
+    }
+
+    .student-details {
+      color: #666;
+      font-size: 0.85rem;
+      margin-bottom: 2px;
+    }
+
+    .student-plan {
+      color: #888;
+      font-size: 0.8rem;
+      font-style: italic;
+    }
+  }
+}
+
+.no-students {
+  text-align: center;
+  color: #999;
+  font-style: italic;
+  padding: 40px 20px;
+  border: 1px solid rgba(31, 58, 38, 0.1);
+  border-radius: 8px;
+  background: rgba(31, 58, 38, 0.01);
+
+  p {
+    margin: 0;
+  }
+}
+
+// Student Confirmation Modal Styles
+.confirmation-modal {
+  max-width: 500px;
+  width: 90%;
+}
+
+.confirmation-content {
+  text-align: center;
+  margin-bottom: 24px;
+
+  p {
+    font-size: 1.1rem;
+    color: #333;
+    margin-bottom: 24px;
+    line-height: 1.5;
+  }
+}
+
+.student-confirmation-info {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px;
+  background: rgba(31, 58, 38, 0.02);
+  border-radius: 12px;
+  border: 1px solid rgba(31, 58, 38, 0.1);
+  text-align: left;
+
+  .student-avatar {
+    flex-shrink: 0;
+
+    .avatar-placeholder {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #1F3A26 0%, #2d4f36 100%);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+  }
+
+  .student-details {
+    flex: 1;
+
+    h3 {
+      margin: 0 0 8px 0;
+      color: #1F3A26;
+      font-size: 1.2rem;
+      font-weight: 600;
+    }
+
+    p {
+      margin: 4px 0;
+      font-size: 0.9rem;
+      color: #666;
+
+      strong {
+        color: #333;
+      }
+    }
+  }
+}
+
+.confirmation-actions {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  padding-top: 16px;
+  border-top: 1px solid rgba(31, 58, 38, 0.1);
+
+  @media (max-width: 480px) {
+    flex-direction: column;
+  }
+}
+
+.btn-confirm {
+  background: linear-gradient(135deg, #1F3A26 0%, #2d4f36 100%);
+  color: white;
+  border: none;
+  padding: 12px 32px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(31, 58, 38, 0.3);
+  }
+}
+
+@keyframes fadeInUp {
+  from{
+    opacity: 0;
+    transform: translateY(+20px);
+  }
+  to{
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Student selection styles for private workout creation
+.student-selection {
+  margin-bottom: 24px;
+  
+  h3 {
+    color: #1F3A26;
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin: 20px 0 16px 0;
+    
+    .required-indicator {
+      color: #e74c3c;
+      font-size: 0.9rem;
+      font-weight: 400;
+    }
+  }
+  
+  h4 {
+    color: #1F3A26;
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 16px 0 12px 0;
+  }
+}
+
+.student-search {
+  margin-bottom: 16px;
+}
+
+.selected-students {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+  border: 2px solid #e9ecef;
+  
+  .students-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+}
+
+.students-list-modal {
+  max-height: 300px;
+  overflow-y: auto;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  padding: 12px;
+  
+  .student-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    border-radius: 6px;
+    margin-bottom: 8px;
+    border: 1px solid #e9ecef;
+    background: #fff;
+    transition: all 0.2s ease;
+    
+    &:last-child {
+      margin-bottom: 0;
+    }
+    
+    &.selectable {
+      cursor: pointer;
+      
+      &:hover {
+        background: #f8f9fa;
+        border-color: #1F3A26;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      }
+    }
+    
+    .student-info {
+      flex: 1;
+      
+      .student-name {
+        font-weight: 600;
+        color: #1F3A26;
+        font-size: 1rem;
+        margin-bottom: 4px;
+      }
+      
+      .student-details {
+        font-size: 0.85rem;
+        color: #6c757d;
+        margin-bottom: 2px;
+      }
+      
+      .student-plan {
+        font-size: 0.8rem;
+        color: #28a745;
+        font-weight: 500;
+      }
+    }
+  }
+}
+
+.available-students {
+  .students-list {
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 12px;
+  }
+}
+
+.btn-add-student,
+.btn-remove-student {
+  background: none;
+  border: none;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  &:hover {
+    transform: scale(1.1);
+  }
+}
+
+.btn-add-student {
+  background: #1F3A26;
+  color: white;
+  
+  &:hover {
+    background: #2d4f36;
+  }
+}
+
+.btn-remove-student {
+  background: rgba(239, 68, 68, 0.1);
+  color: #dc3545;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  
+  &:hover {
+    background: rgba(239, 68, 68, 0.2);
+  }
+}
