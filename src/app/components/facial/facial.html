@@ -7,15 +7,24 @@
       </div>
       <div class="status-area">
         <span
-          [ngClass]="{
-            'status-waiting': statusKind === 'waiting',
-            'status-ok': statusKind === 'ok',
-            'status-error': statusKind === 'error',
-            'status-hint': statusKind === 'hint'
-          }"
+            [ngClass]="{
+                'status-waiting': statusKind === 'waiting',
+                'status-ok': statusKind === 'ok',
+                'status-error': statusKind === 'error',
+                'status-hint': statusKind === 'hint',
+                'status-blocked': statusKind === 'blocked',
+                'status-success': statusKind === 'success',
+                'status-sending': statusKind === 'sending'
+            }"          
           class="status"
         >{{ statusMessage }}</span>
       </div>
+
+      <div class="punch-actions" *ngIf="readyToPunch && !blocked">
+        <button (click)="punch('entry')" class="punch-btn">Bater Entrada</button>
+        <button (click)="punch('exit')" class="punch-btn">Bater Saída</button>
+      </div>
+      
       <div class="actions">
         <button type="button" (click)="refreshCamera()" class="refresh-btn">
           <span class="icon">&#x21bb;</span>
