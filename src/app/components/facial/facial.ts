@@ -21,6 +21,7 @@ export class Facial implements OnInit, OnDestroy {
   punchType: 'entry' | 'exit' | null = null;
   public blocked = false;
   public readyToPunch = false;
+  public blockSecondsLeft: number = 0;
 
   private stream?: MediaStream;
   private interval?: number;
@@ -36,7 +37,6 @@ export class Facial implements OnInit, OnDestroy {
     @Inject(PLATFORM_ID) private platformId: Object,
     private cdr: ChangeDetectorRef
   ) {}
-  
 
   async ngOnInit() {
     if (!this.isBrowser()) {
@@ -157,7 +157,6 @@ export class Facial implements OnInit, OnDestroy {
     this.statusKind = kind;
     this.cdr.detectChanges();
   }
-  
 
   releaseCamera() {
     if (!this.isBrowser()) return; // proteção SSR
@@ -172,7 +171,6 @@ export class Facial implements OnInit, OnDestroy {
     if (this.blockTimerInterval) clearInterval(this.blockTimerInterval);
     if (this.blockTimeout) clearTimeout(this.blockTimeout);
 
-    // Protege acesso ao canvas apenas em ambiente browser
     const canvasEl = this.canvasRef?.nativeElement;
     if (canvasEl) {
       const ctx = canvasEl.getContext('2d');
@@ -182,21 +180,22 @@ export class Facial implements OnInit, OnDestroy {
 
   startBlockCountdown(seconds: number) {
     this.blocked = true;
+    this.blockSecondsLeft = seconds;
     this.blockEndTime = Date.now() + seconds * 1000;
-    this.setStatus(`Aguarde ${seconds} segundos para nova batida...`, 'blocked');
     if (this.blockTimerInterval) clearInterval(this.blockTimerInterval);
 
     this.blockTimerInterval = window.setInterval(() => {
       if (this.destroy) return;
       const now = Date.now();
       const remaining = Math.max(0, Math.ceil((this.blockEndTime - now) / 1000));
-      if (remaining > 0) {
-        this.setStatus(`Aguarde ${remaining} segundos para nova batida...`, 'blocked');
-      } else {
+      this.blockSecondsLeft = remaining;
+      if (remaining <= 0) {
         this.blocked = false;
+        this.blockSecondsLeft = 0;
         clearInterval(this.blockTimerInterval);
         this.setStatus('Aguardando rosto...', 'waiting');
       }
+      this.cdr.detectChanges();
     }, 1000);
   }
 
