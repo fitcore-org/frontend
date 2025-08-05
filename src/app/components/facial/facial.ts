@@ -19,13 +19,13 @@ export class Facial implements OnInit, OnDestroy {
   statusMessage = 'Carregando modelos...';
   statusKind: StatusKind = 'waiting';
   punchType: 'entry' | 'exit' | null = null;
-  private stream?: MediaStream;
-  private interval?: any;
   public blocked = false;
   private blockTimeout?: any;
   private blockEndTime: number = 0;
   private blockTimerInterval?: any;
   public readyToPunch = false;
+  private stream?: MediaStream;
+  private interval?: any;
 
   constructor(private http: HttpClient) {}
 
@@ -48,7 +48,7 @@ export class Facial implements OnInit, OnDestroy {
     if (this.blockTimerInterval) clearInterval(this.blockTimerInterval);
 
     try {
-      await faceapi.nets.tinyFaceDetector.loadFromUri('/assets/models/tiny_face_detector_model');
+      await faceapi.nets.ssdMobilenetv1.loadFromUri('/assets/models/ssd_mobilenetv1_model');
       await faceapi.nets.faceLandmark68Net.loadFromUri('/assets/models/face_landmark_68_model');
       this.setStatus('Buscando webcam...', 'waiting');
 
@@ -79,7 +79,7 @@ export class Facial implements OnInit, OnDestroy {
         this.setStatus('Erro ao acessar webcam: ' + (err?.message || err), 'error');
       }
       console.error('Erro ao acessar webcam:', err);
-    }    
+    }
   }
 
   setStatus(message: string, kind: StatusKind) {
@@ -123,31 +123,52 @@ export class Facial implements OnInit, OnDestroy {
     this.interval = setInterval(async () => {
       if (this.blocked) return;
 
+      const context = canvas.getContext('2d');
+      if (!context) return;
+      context.clearRect(0, 0, canvas.width, canvas.height);
+
+      context.save();
+      context.strokeStyle = 'rgba(250,204,21,0.3)';
+      context.lineWidth = 3;
+      const overlayW = displaySize.width * 0.38;
+      const overlayH = displaySize.height * 0.52;
+      context.strokeRect(
+        (displaySize.width - overlayW) / 2,
+        (displaySize.height - overlayH) / 2,
+        overlayW,
+        overlayH
+      );
+      context.restore();
+
       const detections = await faceapi
-        .detectAllFaces(video, new faceapi.TinyFaceDetectorOptions())
+        .detectAllFaces(video, new faceapi.SsdMobilenetv1Options({ minConfidence: 0.5 }))
         .withFaceLandmarks();
 
-      const context = canvas.getContext('2d');
-      if (context) context.clearRect(0, 0, canvas.width, canvas.height);
-
-      if (detections.length > 0) {
+      if (detections.length > 0 && detections[0].detection.score > 0.7) {
         const main = detections[0].detection.box;
-        const minWidth = displaySize.width * 0.25;
-        const minHeight = displaySize.height * 0.25;
+        const minWidth = displaySize.width * 0.18;
+        const minHeight = displaySize.height * 0.18;
         if (main.width < minWidth || main.height < minHeight) {
           this.setStatus('Aproxime o rosto da câmera', 'hint');
           this.readyToPunch = false;
         } else {
           this.setStatus('Rosto detectado! Escolha o tipo de ponto abaixo.', 'ok');
-          faceapi.draw.drawDetections(canvas, [detections[0]]);
-          faceapi.draw.drawFaceLandmarks(canvas, [detections[0]]);
+          context.save();
+          context.strokeStyle = '#22c55e';
+          context.lineWidth = 4;
+          context.shadowColor = "#4ade80";
+          context.shadowBlur = 14;
+          context.strokeRect(main.x, main.y, main.width, main.height);
+          context.restore();
+          if (detections[0].detection.score > 0.8)
+            faceapi.draw.drawFaceLandmarks(canvas, [detections[0]]);
           this.readyToPunch = true;
         }
       } else {
         this.setStatus('Aguardando rosto...', 'waiting');
         this.readyToPunch = false;
       }
-    }, 150);
+    }, 160);
   }
 
   getBase64FromVideo(video: HTMLVideoElement): string {
