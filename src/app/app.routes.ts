@@ -9,6 +9,7 @@ import { Alunos } from './components/alunos/alunos';
 import { Funcionarios } from './components/funcionarios/funcionarios'
 import { Financeiro } from './components/financeiro/financeiro'
 import { Treinos } from './components/treinos/treinos'
+import { Facial } from './components/facial/facial';
 
 export const routes: Routes = [
     {
@@ -54,6 +55,11 @@ export const routes: Routes = [
     {
         path: 'password-reset',
         component: PasswordReset,
+        canActivate: [guestGuard]
+    },
+    {
+        path: 'facial',
+        component: Facial,
         canActivate: [guestGuard]
     },
 ];

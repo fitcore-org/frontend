@@ -1,0 +1,47 @@
+<div id="container">
+  <div id="camera-container">
+    <div class="camera-area">
+      <video #video width="800" height="540" autoplay muted playsinline></video>
+      <canvas #overlay width="800" height="540" class="overlay"></canvas>
+      <div class="camera-frame"></div>
+    </div>
+    <div class="status-area">
+      <span
+        [ngClass]="{
+          'status-waiting': statusKind === 'waiting',
+          'status-ok': statusKind === 'ok',
+          'status-error': statusKind === 'error',
+          'status-hint': statusKind === 'hint',
+          'status-blocked': statusKind === 'blocked',
+          'status-success': statusKind === 'success',
+          'status-sending': statusKind === 'sending'
+        }"
+        class="status"
+      >{{ statusMessage }}</span>
+    </div>
+
+    <div class="punch-actions" *ngIf="readyToPunch">
+      <button 
+        (click)="punch('entry')" 
+        class="punch-btn" 
+        [disabled]="blocked">
+        Bater Entrada
+        <span *ngIf="blocked"> ({{ blockSecondsLeft }}s)</span>
+      </button>
+      <button 
+        (click)="punch('exit')" 
+        class="punch-btn" 
+        [disabled]="blocked">
+        Bater Saída
+        <span *ngIf="blocked"> ({{ blockSecondsLeft }}s)</span>
+      </button>
+    </div>
+    
+    <div class="actions">
+      <button type="button" (click)="refreshCamera()" class="refresh-btn">
+        <span class="icon">&#x21bb;</span>
+        Atualizar câmera
+      </button>
+    </div>
+  </div>
+</div>

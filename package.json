@@ -30,6 +30,7 @@
     "@angular/router": "^20.0.0",
     "@angular/ssr": "^20.0.4",
     "express": "^5.1.0",
+    "face-api.js": "^0.22.2",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0"
   },
