@@ -871,3 +871,187 @@ textarea.form-input {
     transform: translateY(-2px);
   }
 }
+
+// --- MODAL PLANOS ---
+.modal-backdrop {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(44, 46, 77, 0.26);
+  z-index: 99;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.3s;
+
+  .modal {
+    background: rgba(255, 255, 255, 0.98);
+    border-radius: 20px;
+    max-width: 1120px; 
+    width: 100%;
+    padding: 0;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.25);
+    animation: fadeInUp 0.45s;
+    border: 1px solid #e5e7ef;
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 32px 12px 32px;
+      border-bottom: 1px solid #f3f4f8;
+
+      h3 {
+        margin: 0;
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #1F3A26;
+      }
+      .btn-close {
+        background: transparent;
+        border: none;
+        font-size: 2rem;
+        color: #6c757d;
+        cursor: pointer;
+        padding: 4px 8px;
+
+        &:hover {
+          color: #c44545;
+          transform: scale(1.12);
+        }
+      }
+    }
+
+    .modal-body {
+      padding: 24px 32px 32px 32px;
+      background: transparent;
+      overflow-y: auto;
+      max-height: 80vh;
+      overflow-y: auto;
+
+      form {
+        margin: 0;
+      }
+    }
+  }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+  .form-group-full {
+    grid-column: 1 / -1;
+  }
+  @media (max-width: 900px) {
+    .form-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+}
+
+// --- PLAN ITEMS (DENTRO DO FORMULÁRIO DO MODAL) ---
+.plan-items-section {
+  margin-top: 24px;
+  margin-bottom: 10px;
+
+  h4 {
+    margin-bottom: 10px;
+    color: #2d4f36;
+    font-weight: 600;
+    font-size: 1rem;
+  }
+
+  .plan-item-group {
+    margin-bottom: 10px;
+    background: rgba(230, 236, 244, 0.23);
+    border-radius: 10px;
+    padding: 12px 8px 4px 8px;
+
+    .form-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)) 36px;
+      gap: 10px;
+      align-items: end;
+    }
+    .btn-danger {
+      background: linear-gradient(135deg, #e65050 0%, #b60c19 100%);
+      border: none;
+      color: #fff;
+      border-radius: 8px;
+      padding: 8px 8px;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: all 0.2s;
+
+      &:hover {
+        background: linear-gradient(135deg, #c44545 0%, #750508 100%);
+        transform: scale(1.07);
+      }
+    }
+  }
+}
+
+// --- AÇÕES DA LISTA DE PLANOS ---
+.btn-action.btn-edit {
+  background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    background: linear-gradient(135deg, #357abd 0%, #235184 100%);
+    transform: translateY(-1px) scale(1.07);
+  }
+}
+
+// Usa o mesmo estilo btn-delete já existente
+.btn-action.btn-delete {
+  background: linear-gradient(135deg, #fa6060 0%, #b81e2d 100%);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    background: linear-gradient(135deg, #b81e2d 0%, #7b1127 100%);
+    transform: translateY(-1px) scale(1.07);
+  }
+}
+
+// Para mensagens de lista vazia
+.empty-message {
+  text-align: center;
+  color: #888;
+  font-size: 1rem;
+  margin: 36px 0 28px 0;
+}
+
+// Responsividade do modal
+@media (max-width: 900px) {
+  .modal-backdrop .modal {
+    max-width: 97vw;
+    padding: 0;
+  }
+  .modal-backdrop .modal .modal-body {
+    padding: 16px 10px 20px 10px;
+  }
+}
+@media (max-width: 600px) {
+  .modal-backdrop .modal {
+    border-radius: 10px;
+  }
+  .modal-backdrop .modal .modal-header {
+    padding: 12px 10px 8px 10px;
+  }
+}
+

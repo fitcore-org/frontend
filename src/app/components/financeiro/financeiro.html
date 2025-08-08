@@ -189,6 +189,72 @@
     }
   </div>
 
+<!-- SEÇÃO PLANOS DE ASSINATURA -->
+<div class="section-container">
+  <div class="section-header">
+    <h2 class="section-title">Planos de Assinatura</h2>
+    <div class="header-actions">
+      <button class="btn-primary" (click)="openCreatePlan()">Novo Plano</button>
+    </div>
+  </div>
+
+  <!-- LISTAGEM DE PLANOS -->
+  <div class="data-section" *ngIf="plans && plans.length">
+    <div class="table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Nome</th>
+            <th>Intervalo</th>
+            <th>Valor Mínimo</th>
+            <th>Parcelas</th>
+            <th>Status</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let plan of plans">
+            <td>
+              {{ plan.name }}
+            </td>
+            <td>
+              {{ plan.interval }} <span *ngIf="plan.intervalCount">({{ plan.intervalCount }})</span>
+            </td>
+            <td>
+              <ng-container *ngIf="plan.minimumPrice !== null && plan.minimumPrice !== undefined">
+                {{ formatCurrency(plan.minimumPrice / 100) }}
+              </ng-container>
+              <span *ngIf="plan.minimumPrice === null || plan.minimumPrice === undefined" class="empty-value">-</span>
+            </td>
+            <td>
+              <ng-container *ngIf="plan.installments && plan.installments.length">
+                {{ plan.installments.join(', ') }}
+              </ng-container>
+              <span *ngIf="!plan.installments || !plan.installments.length" class="empty-value">-</span>
+            </td>
+            <td>
+              <span class="status-badge"
+                [class.status-paid]="plan.status === 'active'"
+                [class.status-unpaid]="plan.status !== 'active'">
+                {{ plan.status === 'active' ? 'Ativo' : plan.status }}
+              </span>
+            </td>
+            <td>
+              <button class="btn-action btn-edit" (click)="editPlan(plan)">✏️ Editar</button>
+              <button class="btn-action btn-delete" (click)="deletePlan(plan.id)">🗑️ Excluir</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>      
+    </div>
+  </div>
+  <div *ngIf="plans && plans.length === 0" class="empty-message">
+    Nenhum plano cadastrado.
+  </div>
+</div>
+
+
+
   <!-- Seção de Status de Pagamentos dos Funcionários -->
   <div class="section-container">
     <div class="section-header">
@@ -363,4 +429,126 @@
       </div>
     }
   </div>
+
+<!-- MODAL DE CRIAÇÃO/EDIÇÃO DE PLANO DE ASSINATURA -->
+<div class="modal-backdrop" *ngIf="showCreatePlan">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>{{ editingPlan ? 'Editar Plano' : 'Criar Novo Plano' }}</h3>
+      <button class="btn-close" (click)="toggleCreatePlan()">×</button>
+    </div>
+    <div class="modal-body">
+      <form>
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="planName">Nome do Plano *</label>
+            <input type="text" id="planName" [(ngModel)]="newPlan.name" name="planName" required class="form-input">
+          </div>
+          <div class="form-group">
+            <label for="planCurrency">Moeda *</label>
+            <input type="text" id="planCurrency" [(ngModel)]="newPlan.currency" name="planCurrency" placeholder="BRL" required class="form-input">
+          </div>
+          <div class="form-group">
+            <label for="planInterval">Intervalo *</label>
+            <select id="planInterval" [(ngModel)]="newPlan.interval" name="planInterval" required class="form-input">
+              <option value="">Selecione</option>
+              <option value="day">Dia</option>
+              <option value="week">Semana</option>
+              <option value="month">Mês</option>
+              <option value="year">Ano</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="planIntervalCount">Intervalo Count *</label>
+            <input type="number" id="planIntervalCount" [(ngModel)]="newPlan.intervalCount" name="planIntervalCount" min="1" required class="form-input">
+          </div>
+          <div class="form-group">
+            <label for="planBillingType">Tipo de Cobrança *</label>
+            <select id="planBillingType" [(ngModel)]="newPlan.billingType" name="planBillingType" required class="form-input">
+              <option value="prepaid">Pré-pago</option>
+              <option value="postpaid">Pós-pago</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="planPricingScheme">Tipo de Preço (pricingScheme)</label>
+            <select id="planPricingScheme" [(ngModel)]="newPlan.pricingScheme.schemeType" name="planPricingScheme" class="form-input">
+              <option value="">Selecione</option>
+              <option value="Unit">Unitário</option>
+              <option value="Package">Pacote</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="planQuantity">Quantidade</label>
+            <input type="number" id="planQuantity" [(ngModel)]="newPlan.quantity" name="planQuantity" min="1" class="form-input">
+          </div>
+          <div class="form-group">
+            <label for="planCycles">Ciclos</label>
+            <input type="number" id="planCycles" [(ngModel)]="newPlan.cycles" name="planCycles" min="1" class="form-input">
+          </div>
+          <div class="form-group">
+            <label for="planMinimumPrice">Valor Mínimo (centavos) *</label>
+            <input type="number" id="planMinimumPrice" [(ngModel)]="newPlan.minimumPrice" name="planMinimumPrice" min="0" required class="form-input">
+          </div>
+          <div class="form-group">
+            <label for="planInstallments">Parcelas</label>
+            <input type="text" id="planInstallments" [(ngModel)]="newPlan.installments" name="planInstallments" class="form-input" placeholder="Ex: 1,2,3">
+          </div>
+          <div class="form-group">
+            <label for="planPaymentMethods">Meios de Pagamento *</label>
+            <input type="text" id="planPaymentMethods" [(ngModel)]="newPlan.paymentMethods" name="planPaymentMethods" required class="form-input" placeholder="credit_card,boleto">
+          </div>
+          <div class="form-group">
+            <label for="planStatus">Status *</label>
+            <select id="planStatus" [(ngModel)]="newPlan.status" name="planStatus" required class="form-input">
+              <option value="active">Ativo</option>
+              <option value="inactive">Inativo</option>
+              <option value="deleted">Deletado</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- ITENS DO PLANO -->
+        <div class="plan-items-section">
+          <h4>Itens do Plano *</h4>
+          <div *ngFor="let item of newPlan.items; let i = index" class="plan-item-group">
+            <div class="form-row">
+              <div class="form-group">
+                <label>Nome do Item *</label>
+                <input type="text" [(ngModel)]="item.name" name="itemName{{i}}" required class="form-input">
+              </div>
+              <div class="form-group">
+                <label>Quantidade *</label>
+                <input type="number" [(ngModel)]="item.quantity" name="itemQuantity{{i}}" min="1" required class="form-input">
+              </div>
+              <div class="form-group">
+                <label>Preço (centavos) *</label>
+                <input type="number" [(ngModel)]="item.pricingScheme.price" name="itemPrice{{i}}" min="0" required class="form-input">
+              </div>
+              <div class="form-group">
+                <label>Ciclos</label>
+                <input type="number" [(ngModel)]="item.cycles" name="itemCycles{{i}}" min="1" class="form-input">
+              </div>
+              <div class="form-group form-group-icon">
+                <label>&nbsp;</label>
+                <button type="button" class="btn-danger" (click)="removePlanItem(i)">🗑️</button>
+              </div>
+            </div>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn-secondary" (click)="addPlanItem()">Adicionar Item</button>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn-primary" (click)="savePlan()">
+            {{ editingPlan ? 'Salvar Alterações' : 'Criar Plano' }}
+          </button>
+          <button type="button" class="btn-secondary" (click)="toggleCreatePlan()">Cancelar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+
 </div>

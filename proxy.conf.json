@@ -35,6 +35,14 @@
     "changeOrigin": true,
     "logLevel": "debug"
   },
+
+  "/payment/*": {
+    "target": "http://localhost:8080",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "debug"
+  },
+  
   "/expenses/manual": {
     "target": "http://localhost:8004",
     "secure": false,
@@ -58,7 +66,7 @@
     "secure": false,
     "changeOrigin": true
   },
-  "/auth": {
+  "/auth/*": {
     "target": "http://localhost:8080",
     "secure": false,
     "changeOrigin": true

@@ -6,6 +6,9 @@
       <button class="btn-positions" (click)="loadPositions()" [disabled]="isLoadingPositions">
         {{ isLoadingPositions ? 'Carregando...' : 'Ver Cargos Disponíveis' }}
       </button>
+      <button class="btn-positions" (click)="goToFacial()">
+        🕑 Bater Ponto
+      </button>
       <button class="btn-create-employee" (click)="openCreateEmployeeModal()">
         Criar Funcionário
       </button>

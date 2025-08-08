@@ -2,6 +2,7 @@ import { Component, inject, OnInit, ChangeDetectorRef, NgZone } from '@angular/c
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
+import { Router } from '@angular/router';
 
 interface Employee {
   id: string;
@@ -68,6 +69,7 @@ export class Funcionarios implements OnInit {
   filteredEmployees: Employee[] = [];
   selectedEmployee: Employee | null = null;
   isEmployeeModalOpen = false;
+  private router = inject(Router);
   
   positions: Position[] = [];
   isPositionsModalOpen = false;
@@ -363,7 +365,10 @@ export class Funcionarios implements OnInit {
     });
   }
   
-
+  goToFacial(): void {
+    this.router.navigate(['/facial']);
+  }
+  
   // Employee Edit Methods
   openEditEmployeeModal(employee: Employee): void {
     this.editingEmployee = employee;
