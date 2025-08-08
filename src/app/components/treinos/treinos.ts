@@ -38,19 +38,9 @@ interface CreateWorkoutRequest {
   items: CreateWorkoutItem[];
 }
 
-interface CreatePrivateWorkoutRequest {
-  name: string;
-  description: string;
-  items: CreateWorkoutItem[];
-  studentIds: string[];
-}
 
-interface UpdateWorkoutRequest {
-  name: string;
-  description: string;
-  items: CreateWorkoutItem[];
-  studentIds?: string[];
-}
+
+
 
 interface Student {
   id: string;
@@ -67,6 +57,20 @@ interface Student {
   active: boolean;
   registrationDate: string;
   profileUrl?: string;
+}
+
+interface CreatePrivateWorkoutRequest {
+  name: string;
+  description: string;
+  items: CreateWorkoutItem[];
+  studentIds: string[];
+}
+
+interface UpdatePrivateWorkoutRequest {
+  name: string;
+  description: string;
+  items: CreateWorkoutItem[];
+  studentIds: string[];
 }
 
 interface Workout {
@@ -97,11 +101,6 @@ export class Treinos implements OnInit {
   selectedWorkout: Workout | null = null;
   isWorkoutModalOpen = false;
   
-  // Student management modal properties
-  showStudentManagementModal = false;
-  selectedWorkoutForStudents: Workout | null = null;
-  tempStudentIds: string[] = []; // Lista temporária de IDs de alunos
-  
   // Create workout modal properties
   showCreateWorkoutModal = false;
   newWorkout: CreateWorkoutRequest = {
@@ -120,14 +119,17 @@ export class Treinos implements OnInit {
   };
   tempSelectedStudentIds: string[] = []; // Lista temporária para seleção de alunos na criação
 
-  // Edit workout modal properties
-  showEditWorkoutModal = false;
-  editWorkout: UpdateWorkoutRequest = {
+  // Edit private workout modal properties
+  showEditPrivateWorkoutModal = false;
+  editPrivateWorkout: UpdatePrivateWorkoutRequest = {
     name: '',
     description: '',
-    items: []
+    items: [],
+    studentIds: []
   };
-  editWorkoutId: string = '';
+  editingWorkoutId: string = '';
+  tempEditSelectedStudentIds: string[] = []; // Lista temporária para seleção de alunos na edição
+  originalStudentIds: string[] = []; // Guarde os IDs originais para preservar seleção
 
   get workoutSearch(): string {
     return this.searchTerm();
@@ -152,6 +154,8 @@ export class Treinos implements OnInit {
   set studentSearch(value: string) {
     this.studentSearchTerm.set(value);
   }
+
+
   
   private http = inject(HttpClient);
 
@@ -201,10 +205,12 @@ export class Treinos implements OnInit {
         this.allStudents.set(data);
       },
       error: (error) => {
-        console.error('Erro ao carregar alunos:', error);
+        console.error('Erro ao carregar estudantes:', error);
       }
     });
   }
+
+
 
   getFilteredPublicWorkouts(): Workout[] {
     const search = this.searchTerm().toLowerCase();
@@ -246,7 +252,6 @@ export class Treinos implements OnInit {
     this.selectedWorkout = null;
   }
 
-  // Create workout modal methods
   openCreateWorkoutModal(): void {
     this.showCreateWorkoutModal = true;
     this.newWorkout = {
@@ -266,76 +271,6 @@ export class Treinos implements OnInit {
     this.exerciseSearchTerm.set('');
   }
 
-  getFilteredExercises(): Exercise[] {
-    const search = this.exerciseSearchTerm().toLowerCase();
-    if (!search) return this.allExercises();
-    return this.allExercises().filter(exercise =>
-      exercise.name.toLowerCase().includes(search) ||
-      exercise.muscleGroup.toLowerCase().includes(search) ||
-      exercise.equipment.toLowerCase().includes(search)
-    );
-  }
-
-  addExerciseToWorkout(exercise: Exercise): void {
-    const newItem: CreateWorkoutItem = {
-      exerciseId: exercise.id,
-      sets: '3',
-      reps: '12',
-      restSeconds: 60,
-      observation: '',
-      order: this.newWorkout.items.length + 1
-    };
-    
-    this.newWorkout.items.push(newItem);
-  }
-
-  removeExerciseFromWorkout(index: number): void {
-    this.newWorkout.items.splice(index, 1);
-    // Reorder items
-    this.newWorkout.items.forEach((item, i) => {
-      item.order = i + 1;
-    });
-  }
-
-  moveExercise(index: number, direction: number): void {
-    const newIndex = index + direction;
-    if (newIndex < 0 || newIndex >= this.newWorkout.items.length) return;
-    
-    const items = [...this.newWorkout.items];
-    [items[index], items[newIndex]] = [items[newIndex], items[index]];
-    
-    // Update orders
-    items.forEach((item, i) => {
-      item.order = i + 1;
-    });
-    
-    this.newWorkout.items = items;
-  }
-
-  getExerciseById(exerciseId: string): Exercise | undefined {
-    return this.allExercises().find(exercise => exercise.id === exerciseId);
-  }
-
-  createWorkout(): void {
-    if (!this.newWorkout.name.trim() || this.newWorkout.items.length === 0) {
-      alert('Por favor, preencha o nome do treino e adicione pelo menos um exercício.');
-      return;
-    }
-
-    this.http.post('/api/v1/workouts', this.newWorkout).subscribe({
-      next: () => {
-        alert('Treino criado com sucesso!');
-        this.closeCreateWorkoutModal();
-        this.loadPublicWorkouts(); // Reload workouts
-      },
-      error: (error) => {
-        console.error('Erro ao criar treino:', error);
-        alert('Erro ao criar treino. Tente novamente.');
-      }
-    });
-  }
-
-  // Create private workout modal methods
   openCreatePrivateWorkoutModal(): void {
     this.showCreatePrivateWorkoutModal = true;
     this.newPrivateWorkout = {
@@ -394,9 +329,35 @@ export class Treinos implements OnInit {
     });
   }
 
+  moveExerciseInPrivateWorkout(index: number, direction: number): void {
+    const newIndex = index + direction;
+    if (newIndex < 0 || newIndex >= this.newPrivateWorkout.items.length) return;
+    
+    const items = [...this.newPrivateWorkout.items];
+    [items[index], items[newIndex]] = [items[newIndex], items[index]];
+    
+    // Update orders
+    items.forEach((item, i) => {
+      item.order = i + 1;
+    });
+    
+    this.newPrivateWorkout.items = items;
+  }
+
   createPrivateWorkout(): void {
-    if (!this.newPrivateWorkout.name.trim() || this.newPrivateWorkout.items.length === 0) {
-      alert('Por favor, preencha o nome do treino e adicione pelo menos um exercício.');
+    // Validação completa dos campos obrigatórios
+    if (!this.newPrivateWorkout.name || !this.newPrivateWorkout.name.trim()) {
+      alert('Por favor, preencha o nome do treino.');
+      return;
+    }
+
+    if (!this.newPrivateWorkout.description || !this.newPrivateWorkout.description.trim()) {
+      alert('Por favor, preencha a descrição do treino.');
+      return;
+    }
+
+    if (this.newPrivateWorkout.items.length === 0) {
+      alert('Por favor, adicione pelo menos um exercício ao treino.');
       return;
     }
 
@@ -405,14 +366,22 @@ export class Treinos implements OnInit {
       return;
     }
 
-    // Set student IDs from temporary selection
+    for (let i = 0; i < this.newPrivateWorkout.items.length; i++) {
+      const item = this.newPrivateWorkout.items[i];
+      if (!item.sets || !item.reps || !item.restSeconds) {
+        alert(`Por favor, preencha todos os campos do exercício ${i + 1}.`);
+        return;
+      }
+    }
+
+    // Definir os studentIds a partir dos IDs selecionados temporariamente
     this.newPrivateWorkout.studentIds = [...this.tempSelectedStudentIds];
 
     this.http.post('/api/v1/workouts/private', this.newPrivateWorkout).subscribe({
       next: () => {
         alert('Treino privado criado com sucesso!');
         this.closeCreatePrivateWorkoutModal();
-        this.loadPrivateWorkouts(); // Reload private workouts
+        this.loadPrivateWorkouts(); 
       },
       error: (error) => {
         console.error('Erro ao criar treino privado:', error);
@@ -421,117 +390,232 @@ export class Treinos implements OnInit {
     });
   }
 
-  deleteWorkout(workoutId: string, workoutName: string): void {
-    if (confirm(`Tem certeza que deseja deletar o treino "${workoutName}"? Esta ação não pode ser desfeita.`)) {
-      this.http.delete(`/api/v1/workouts/${workoutId}`).subscribe({
-        next: () => {
-          alert('Treino deletado com sucesso!');
-          this.loadPublicWorkouts();
-          this.loadPrivateWorkouts();
-          // Fechar modal se o treino deletado estava sendo visualizado
-          if (this.selectedWorkout && this.selectedWorkout.id === workoutId) {
-            this.closeWorkoutModal();
-          }
-        },
-        error: (error) => {
-          console.error('Erro ao deletar treino:', error);
-          alert('Erro ao deletar treino. Tente novamente.');
-        }
-      });
-    }
+  getSelectedStudentsForPrivateWorkout(): Student[] {
+    return this.tempSelectedStudentIds
+      .map(id => this.allStudents().find(student => student.id === id))
+      .filter(student => student !== undefined) as Student[];
   }
 
-  // Edit workout modal methods
-  openEditWorkoutModal(workout: Workout): void {
-    this.editWorkoutId = workout.id;
-    this.editWorkout = {
-      name: workout.name,
-      description: workout.description,
-      items: workout.items.map(item => ({
-        exerciseId: item.exercise.id,
-        sets: item.sets,
-        reps: item.reps,
-        restSeconds: item.restSeconds,
-        observation: item.observation,
-        order: item.order
-      }))
-    };
-    this.showEditWorkoutModal = true;
-    this.exerciseSearchTerm.set('');
+  getAvailableStudentsForPrivateWorkout(): Student[] {
+    const search = this.studentSearchTerm().toLowerCase();
+    let students = this.allStudents();
     
-    // Fechar modal de detalhes se estiver aberto
-    if (this.selectedWorkout) {
-      this.closeWorkoutModal();
+    if (search) {
+      students = students.filter(student =>
+        student.name.toLowerCase().includes(search) ||
+        student.cpf.includes(search) ||
+        student.email.toLowerCase().includes(search)
+      );
     }
+    
+    return students.filter(student => !this.tempSelectedStudentIds.includes(student.id));
   }
 
-  closeEditWorkoutModal(): void {
-    this.showEditWorkoutModal = false;
-    this.editWorkout = {
+  getStudentById(studentId: string): Student | undefined {
+    return this.allStudents().find(student => student.id === studentId);
+  }
+
+  // Edit Private Workout Methods
+  loadWorkoutById(workoutId: string): void {
+    this.http.get<Workout>(`/api/v1/workouts/${workoutId}`).subscribe({
+      next: (workout) => {
+        this.editPrivateWorkout = {
+          name: workout.name,
+          description: workout.description,
+          items: workout.items.map(item => ({
+            exerciseId: item.exercise.id,
+            sets: item.sets,
+            reps: item.reps,
+            restSeconds: item.restSeconds,
+            observation: item.observation,
+            order: item.order
+          })),
+          studentIds: workout.studentIds || []
+        };
+  this.originalStudentIds = workout.studentIds || [];
+  this.tempEditSelectedStudentIds = [...this.originalStudentIds];
+        this.editingWorkoutId = workoutId;
+        this.showEditPrivateWorkoutModal = true;
+      },
+      error: (error) => {
+        console.error('Erro ao carregar treino:', error);
+        alert('Erro ao carregar treino. Tente novamente.');
+      }
+    });
+  }
+
+  openEditPrivateWorkoutModal(workoutId: string): void {
+    this.exerciseSearchTerm.set('');
+    this.studentSearchTerm.set('');
+    this.loadWorkoutById(workoutId);
+  }
+
+  closeEditPrivateWorkoutModal(): void {
+    this.showEditPrivateWorkoutModal = false;
+    this.editPrivateWorkout = {
       name: '',
       description: '',
-      items: []
+      items: [],
+      studentIds: []
     };
-    this.editWorkoutId = '';
+  this.tempEditSelectedStudentIds = [];
+  this.originalStudentIds = [];
+  this.editingWorkoutId = '';
     this.exerciseSearchTerm.set('');
+    this.studentSearchTerm.set('');
   }
 
-  addExerciseToEditWorkout(exercise: Exercise): void {
+  updatePrivateWorkout(): void {
+    if (!this.editPrivateWorkout.name.trim() || this.editPrivateWorkout.items.length === 0) {
+      alert('Por favor, preencha o nome do treino e adicione pelo menos um exercício.');
+      return;
+    }
+
+    // Sempre usar tempEditSelectedStudentIds que já contém os IDs corretos
+    this.editPrivateWorkout.studentIds = [...this.tempEditSelectedStudentIds];
+
+    this.http.put(`/api/v1/workouts/private/${this.editingWorkoutId}`, this.editPrivateWorkout).subscribe({
+      next: () => {
+        alert('Treino privado atualizado com sucesso!');
+        this.closeEditPrivateWorkoutModal();
+        this.loadPrivateWorkouts(); 
+      },
+      error: (error) => {
+        console.error('Erro ao atualizar treino privado:', error);
+        alert('Erro ao atualizar treino privado. Tente novamente.');
+      }
+    });
+  }
+
+  // Edit workout helper methods
+  getSelectedStudentsForEditPrivateWorkout(): Student[] {
+    return this.tempEditSelectedStudentIds
+      .map(id => this.allStudents().find(student => student.id === id))
+      .filter(student => student !== undefined) as Student[];
+  }
+
+  getAvailableStudentsForEditPrivateWorkout(): Student[] {
+    const search = this.studentSearchTerm().toLowerCase();
+    let students = this.allStudents();
+    
+    if (search) {
+      students = students.filter(student =>
+        student.name.toLowerCase().includes(search) ||
+        student.cpf.includes(search) ||
+        student.email.toLowerCase().includes(search)
+      );
+    }
+    
+    return students.filter(student => !this.tempEditSelectedStudentIds.includes(student.id));
+  }
+
+  addStudentToEditPrivateWorkout(student: Student): void {
+    if (!this.tempEditSelectedStudentIds.includes(student.id)) {
+      this.tempEditSelectedStudentIds.push(student.id);
+    }
+  }
+
+  removeStudentFromEditPrivateWorkout(studentId: string): void {
+    this.tempEditSelectedStudentIds = this.tempEditSelectedStudentIds.filter(id => id !== studentId);
+  }
+
+  addExerciseToEditPrivateWorkout(exercise: Exercise): void {
     const newItem: CreateWorkoutItem = {
       exerciseId: exercise.id,
       sets: '3',
       reps: '12',
       restSeconds: 60,
       observation: '',
-      order: this.editWorkout.items.length + 1
+      order: this.editPrivateWorkout.items.length + 1
     };
     
-    this.editWorkout.items.push(newItem);
+    this.editPrivateWorkout.items.push(newItem);
   }
 
-  removeExerciseFromEditWorkout(index: number): void {
-    this.editWorkout.items.splice(index, 1);
-    // Reorder items
-    this.editWorkout.items.forEach((item, i) => {
+  removeExerciseFromEditPrivateWorkout(index: number): void {
+    this.editPrivateWorkout.items.splice(index, 1);
+    this.editPrivateWorkout.items.forEach((item, i) => {
       item.order = i + 1;
     });
   }
 
-  moveExerciseInEdit(index: number, direction: number): void {
+  moveExerciseInEditPrivateWorkout(index: number, direction: number): void {
     const newIndex = index + direction;
-    if (newIndex < 0 || newIndex >= this.editWorkout.items.length) return;
+    if (newIndex < 0 || newIndex >= this.editPrivateWorkout.items.length) return;
+
+    const temp = this.editPrivateWorkout.items[index];
+    this.editPrivateWorkout.items[index] = this.editPrivateWorkout.items[newIndex];
+    this.editPrivateWorkout.items[newIndex] = temp;
+
+    this.editPrivateWorkout.items.forEach((item, i) => {
+      item.order = i + 1;
+    });
+  }
+
+  getFilteredExercises(): Exercise[] {
+    const search = this.exerciseSearchTerm().toLowerCase();
+    if (!search) return this.allExercises();
+    return this.allExercises().filter(exercise =>
+      exercise.name.toLowerCase().includes(search) ||
+      exercise.muscleGroup.toLowerCase().includes(search) ||
+      exercise.equipment.toLowerCase().includes(search)
+    );
+  }
+
+  addExerciseToWorkout(exercise: Exercise): void {
+    const newItem: CreateWorkoutItem = {
+      exerciseId: exercise.id,
+      sets: '3',
+      reps: '12',
+      restSeconds: 60,
+      observation: '',
+      order: this.newWorkout.items.length + 1
+    };
     
-    const items = [...this.editWorkout.items];
+    this.newWorkout.items.push(newItem);
+  }
+
+  removeExerciseFromWorkout(index: number): void {
+    this.newWorkout.items.splice(index, 1);
+
+    this.newWorkout.items.forEach((item, i) => {
+      item.order = i + 1;
+    });
+  }
+
+  moveExercise(index: number, direction: number): void {
+    const newIndex = index + direction;
+    if (newIndex < 0 || newIndex >= this.newWorkout.items.length) return;
+    
+    const items = [...this.newWorkout.items];
     [items[index], items[newIndex]] = [items[newIndex], items[index]];
     
-    // Update orders
     items.forEach((item, i) => {
       item.order = i + 1;
     });
     
-    this.editWorkout.items = items;
+    this.newWorkout.items = items;
   }
 
-  updateWorkout(): void {
-    if (!this.editWorkout.name.trim() || this.editWorkout.items.length === 0) {
+  getExerciseById(exerciseId: string): Exercise | undefined {
+    return this.allExercises().find(exercise => exercise.id === exerciseId);
+  }
+
+  createWorkout(): void {
+    if (!this.newWorkout.name.trim() || this.newWorkout.items.length === 0) {
       alert('Por favor, preencha o nome do treino e adicione pelo menos um exercício.');
       return;
     }
 
-    this.http.put(`/api/v1/workouts/${this.editWorkoutId}`, this.editWorkout).subscribe({
+    this.http.post('/api/v1/workouts', this.newWorkout).subscribe({
       next: () => {
-        alert('Treino atualizado com sucesso!');
-        this.closeEditWorkoutModal();
-        this.loadPublicWorkouts();
-        this.loadPrivateWorkouts();
-        // Fechar modal de detalhes se estava aberto
-        if (this.selectedWorkout && this.selectedWorkout.id === this.editWorkoutId) {
-          this.closeWorkoutModal();
-        }
+        alert('Treino criado com sucesso!');
+        this.closeCreateWorkoutModal();
+        this.loadPublicWorkouts(); 
       },
       error: (error) => {
-        console.error('Erro ao atualizar treino:', error);
-        alert('Erro ao atualizar treino. Tente novamente.');
+        console.error('Erro ao criar treino:', error);
+        alert('Erro ao criar treino. Tente novamente.');
       }
     });
   }
@@ -563,120 +647,19 @@ export class Treinos implements OnInit {
     let totalTime = 0;
     
     workout.items.forEach(item => {
-      // Tempo estimado por série (30 segundos de execução)
+      
       const sets = parseInt(item.sets) || 0;
-      const executionTime = sets * 30; // 30 segundos por série
-      const restTime = (sets - 1) * item.restSeconds; // descanso entre séries
+      const executionTime = sets * 30;
+      const restTime = (sets - 1) * item.restSeconds; 
       
       totalTime += executionTime + restTime;
     });
     
-    // Adiciona tempo de transição entre exercícios (30 segundos cada)
+
     totalTime += (workout.items.length - 1) * 30;
     
-    return Math.ceil(totalTime / 60); // Converte para minutos
+    return Math.ceil(totalTime / 60); 
   }
 
-  // Student management methods
-  openStudentManagementModal(workout: Workout): void {
-    this.selectedWorkoutForStudents = workout;
-    this.tempStudentIds = [...workout.studentIds]; // Copia os IDs atuais para a lista temporária
-    this.showStudentManagementModal = true;
-    this.studentSearchTerm.set('');
-  }
 
-  closeStudentManagementModal(): void {
-    this.showStudentManagementModal = false;
-    this.selectedWorkoutForStudents = null;
-    this.tempStudentIds = [];
-    this.studentSearchTerm.set('');
-  }
-
-  getFilteredStudents(): Student[] {
-    const search = this.studentSearchTerm().toLowerCase();
-    if (!search) return this.allStudents();
-    return this.allStudents().filter(student =>
-      student.name.toLowerCase().includes(search) ||
-      student.cpf.includes(search) ||
-      student.email.toLowerCase().includes(search)
-    );
-  }
-
-  getStudentsFromWorkout(workout: Workout): Student[] {
-    return this.allStudents().filter(student => 
-      workout.studentIds.includes(student.id)
-    );
-  }
-
-  getTempStudentsFromWorkout(): Student[] {
-    return this.allStudents().filter(student => 
-      this.tempStudentIds.includes(student.id)
-    );
-  }
-
-  getAvailableStudents(workout: Workout): Student[] {
-    return this.getFilteredStudents().filter(student => 
-      !this.tempStudentIds.includes(student.id) // Usa a lista temporária
-    );
-  }
-
-  addStudentToWorkout(studentId: string): void {
-    if (!this.tempStudentIds.includes(studentId)) {
-      this.tempStudentIds.push(studentId);
-    }
-  }
-
-  confirmStudentChanges(): void {
-    if (!this.selectedWorkoutForStudents) return;
-
-    const updateData = {
-      studentIds: this.tempStudentIds
-    };
-
-    this.http.put(`/api/v1/workouts/${this.selectedWorkoutForStudents.id}`, updateData).subscribe({
-      next: () => {
-        this.loadPrivateWorkouts();
-        // Atualizar o workout selecionado
-        if (this.selectedWorkoutForStudents) {
-          this.selectedWorkoutForStudents.studentIds = this.tempStudentIds;
-        }
-        this.closeStudentManagementModal();
-        alert('Alunos do treino atualizados com sucesso!');
-      },
-      error: (error) => {
-        console.error('Erro ao atualizar alunos do treino:', error);
-        alert('Erro ao atualizar alunos do treino. Tente novamente.');
-      }
-    });
-  }
-
-  removeStudentFromWorkout(studentId: string): void {
-    this.tempStudentIds = this.tempStudentIds.filter(id => id !== studentId);
-  }
-
-  getStudentById(studentId: string): Student | undefined {
-    return this.allStudents().find(student => student.id === studentId);
-  }
-
-  // Methods for filtering students in private workout creation
-  getAvailableStudentsForPrivateWorkout(): Student[] {
-    const search = this.studentSearchTerm().toLowerCase();
-    let students = this.allStudents();
-    
-    if (search) {
-      students = students.filter(student =>
-        student.name.toLowerCase().includes(search) ||
-        student.cpf.includes(search) ||
-        student.email.toLowerCase().includes(search)
-      );
-    }
-    
-    return students.filter(student => !this.tempSelectedStudentIds.includes(student.id));
-  }
-
-  getSelectedStudentsForPrivateWorkout(): Student[] {
-    return this.tempSelectedStudentIds
-      .map(id => this.allStudents().find(student => student.id === id))
-      .filter(student => student !== undefined) as Student[];
-  }
 }

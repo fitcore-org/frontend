@@ -2,16 +2,24 @@
   <h1 class="funcionarios-title">Funcionários</h1>
   
   <div class="filter-container">
+    <div class="action-buttons">
+      <button class="btn-positions" (click)="loadPositions()" [disabled]="isLoadingPositions">
+        {{ isLoadingPositions ? 'Carregando...' : 'Ver Cargos Disponíveis' }}
+      </button>
+      <button class="btn-create-employee" (click)="openCreateEmployeeModal()">
+        Criar Funcionário
+      </button>
+    </div>
     <input type="text" 
            [(ngModel)]="employeeSearch" 
-           (input)="filterEmployees()" 
+           (ngModelChange)="filterEmployees()" 
            placeholder="Buscar funcionário por nome..." 
            class="search-input">
-    <select [(ngModel)]="selectedRole" (change)="filterEmployees()" class="role-filter">
+    <select [(ngModel)]="selectedRole" (ngModelChange)="filterEmployees()" class="role-filter">
       <option value="">Todos os papéis</option>
-      <option value="MANAGER">Gerente</option>
-      <option value="INSTRUCTOR">Instrutor</option>
-      <option value="RECEPTIONIST">Recepcionista</option>
+      @for (role of roles; track role) {
+        <option [value]="role">{{ getRoleDisplayName(role) }}</option>
+      }
     </select>
   </div>
   
@@ -26,7 +34,15 @@
         <p><strong>Telefone:</strong> {{ employee.phone }}</p>
         <p><strong>Email:</strong> {{ employee.email }}</p>
         <p><strong>Papel:</strong> {{ getRoleDisplayName(employee.role) }}</p>
-        <button class="btn-read-more" (click)="openEmployeeModal(employee)">Ler mais</button>
+        <div class="employee-actions">
+          <button class="btn-action btn-edit" (click)="openEditEmployeeModal(employee)">
+            Editar
+          </button>
+          <button class="btn-action btn-delete" (click)="deleteEmployee(employee)">
+            Excluir
+          </button>
+          <button class="btn-read-more" (click)="openEmployeeModal(employee)">Ver Detalhes</button>
+        </div>
       </div>
     }
     @if (filteredEmployees.length === 0) {
@@ -62,6 +78,415 @@
           }
           <p><strong>Data de Cadastro:</strong> {{ selectedEmployee.registrationDate | date:'dd/MM/yyyy HH:mm' }}</p>
         </div>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Modal para posições/cargos disponíveis -->
+@if (isPositionsModalOpen) {
+  <div class="modal-overlay" (click)="closePositionsModal()">
+    <div class="modal-content positions-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Cargos Disponíveis</h2>
+        <div class="modal-header-actions">
+          <button class="btn-add-position" (click)="openCreatePositionModal()">
+            + Novo Cargo
+          </button>
+          <button class="btn-close" (click)="closePositionsModal()">×</button>
+        </div>
+      </div>
+      <div class="modal-body">
+        <div class="positions-grid">
+          @for (position of positions; track position.id) {
+            <div class="position-card">
+              <h3>{{ getRoleDisplayName(position.name) }}</h3>
+              <p class="position-description">{{ position.description }}</p>
+              <div class="position-salary">
+                <strong>Salário Base:</strong> 
+                <span class="salary-value">
+                  {{ position.base_salary === 0 ? 'A definir' : formatSalary(position.base_salary) }}
+                </span>
+              </div>
+              <div class="position-actions">
+                <button class="btn-edit" (click)="openEditPositionModal(position)" title="Editar">
+                  <img src="/edit.svg" alt="Editar" width="16" height="16">
+                </button>
+                <button class="btn-delete" (click)="deletePosition(position)" title="Excluir">
+                  <img src="/delete.svg" alt="Excluir" width="16" height="16">
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+}
+@if (isCreatePositionModalOpen) {
+  <div class="modal-overlay" (click)="closeCreatePositionModal()">
+    <div class="modal-content create-position-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Criar Novo Cargo</h2>
+        <button class="btn-close" (click)="closeCreatePositionModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <form class="position-form">
+          <div class="form-group">
+            <label for="positionName">Nome do Cargo *</label>
+            <input
+              type="text"
+              id="positionName"
+              name="positionName"
+              [(ngModel)]="newPosition.name"
+              placeholder="Ex: DEVELOPER"
+              class="form-input"
+              [disabled]="isCreatingPosition"
+              maxlength="50"
+            >
+            <small class="form-hint">O nome será convertido para maiúsculas automaticamente</small>
+          </div>
+          
+          <div class="form-group">
+            <label for="positionDescription">Descrição *</label>
+            <textarea
+              id="positionDescription"
+              name="positionDescription"
+              [(ngModel)]="newPosition.description"
+              placeholder="Descreva as responsabilidades do cargo..."
+              class="form-textarea"
+              [disabled]="isCreatingPosition"
+              maxlength="255"
+              rows="3"
+            ></textarea>
+          </div>
+          
+          <div class="form-group">
+            <label for="positionSalary">Salário Base (R$)</label>
+            <input
+              type="number"
+              id="positionSalary"
+              name="positionSalary"
+              [(ngModel)]="newPosition.base_salary"
+              placeholder="0.00"
+              class="form-input"
+              [disabled]="isCreatingPosition"
+              min="0"
+              step="0.01"
+            >
+            <small class="form-hint">Deixe 0 se o salário será definido posteriormente</small>
+          </div>
+          
+          <div class="form-actions">
+            <button
+              type="button"
+              class="btn-cancel"
+              (click)="closeCreatePositionModal()"
+              [disabled]="isCreatingPosition"
+            >
+              Cancelar
+            </button>
+            <button
+              type="button"
+              class="btn-create"
+              (click)="createPosition()"
+              [disabled]="isCreatingPosition"
+            >
+              {{ isCreatingPosition ? 'Criando...' : 'Criar Cargo' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+}
+
+@if (isEditPositionModalOpen && editingPosition) {
+  <div class="modal-overlay" (click)="closeEditPositionModal()">
+    <div class="modal-content create-position-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Editar Cargo</h2>
+        <button class="btn-close" (click)="closeEditPositionModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <form class="position-form">
+          <div class="form-group">
+            <label for="editPositionName">Nome do Cargo *</label>
+            <input
+              type="text"
+              id="editPositionName"
+              name="editPositionName"
+              [(ngModel)]="updatedPosition.name"
+              placeholder="Ex: DEVELOPER"
+              class="form-input"
+              [disabled]="isUpdatingPosition"
+              maxlength="50"
+            >
+            <small class="form-hint">O nome será convertido para maiúsculas automaticamente</small>
+          </div>
+          
+          <div class="form-group">
+            <label for="editPositionDescription">Descrição *</label>
+            <textarea
+              id="editPositionDescription"
+              name="editPositionDescription"
+              [(ngModel)]="updatedPosition.description"
+              placeholder="Descreva as responsabilidades do cargo..."
+              class="form-textarea"
+              [disabled]="isUpdatingPosition"
+              maxlength="255"
+              rows="3"
+            ></textarea>
+          </div>
+          
+          <div class="form-group">
+            <label for="editPositionSalary">Salário Base (R$)</label>
+            <input
+              type="number"
+              id="editPositionSalary"
+              name="editPositionSalary"
+              [(ngModel)]="updatedPosition.base_salary"
+              placeholder="0.00"
+              class="form-input"
+              [disabled]="isUpdatingPosition"
+              min="0"
+              step="0.01"
+            >
+            <small class="form-hint">Deixe 0 se o salário será definido posteriormente</small>
+          </div>
+          
+          <div class="form-actions">
+            <button
+              type="button"
+              class="btn-cancel"
+              (click)="closeEditPositionModal()"
+              [disabled]="isUpdatingPosition"
+            >
+              Cancelar
+            </button>
+            <button
+              type="button"
+              class="btn-create"
+              (click)="updatePosition()"
+              [disabled]="isUpdatingPosition"
+            >
+              {{ isUpdatingPosition ? 'Atualizando...' : 'Atualizar Cargo' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Modal para criar funcionário -->
+@if (isCreateEmployeeModalOpen) {
+  <div class="modal-overlay" (click)="closeCreateEmployeeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Criar Novo Funcionário</h2>
+        <button class="btn-close" (click)="closeCreateEmployeeModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <form (ngSubmit)="createEmployee()" #createEmployeeForm="ngForm">
+          <div class="form-group">
+            <label for="employeeName">Nome</label>
+            <input
+              type="text"
+              id="employeeName"
+              [(ngModel)]="newEmployee.name"
+              name="employeeName"
+              required
+              class="form-input"
+              placeholder="Digite o nome completo"
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="employeeEmail">Email</label>
+            <input
+              type="email"
+              id="employeeEmail"
+              [(ngModel)]="newEmployee.email"
+              name="employeeEmail"
+              required
+              class="form-input"
+              placeholder="Digite o email"
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="employeeCpf">CPF</label>
+            <input
+              type="text"
+              id="employeeCpf"
+              [(ngModel)]="newEmployee.cpf"
+              name="employeeCpf"
+              required
+              class="form-input"
+              placeholder="000.000.000-00"
+              maxlength="14"
+              (input)="formatCPFInput($event)"
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="employeeBirthDate">Data de Nascimento</label>
+            <input
+              type="date"
+              id="employeeBirthDate"
+              [(ngModel)]="newEmployee.birthDate"
+              name="employeeBirthDate"
+              required
+              class="form-input"
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="employeePhone">Telefone</label>
+            <input
+              type="tel"
+              id="employeePhone"
+              [(ngModel)]="newEmployee.phone"
+              name="employeePhone"
+              required
+              class="form-input"
+              placeholder="(00) 00000-0000"
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="employeeRole">Cargo</label>
+            <select
+              id="employeeRole"
+              [(ngModel)]="newEmployee.roleType"
+              name="employeeRole"
+              required
+              class="form-input"
+            >
+              <option value="">Selecione um cargo</option>
+              @for (role of roles; track role) {
+                <option [value]="role">{{ getRoleDisplayName(role) }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="employeeHireDate">Data de Contratação</label>
+            <input
+              type="date"
+              id="employeeHireDate"
+              [(ngModel)]="newEmployee.hireDate"
+              name="employeeHireDate"
+              required
+              class="form-input"
+            >
+          </div>
+
+          <div class="modal-actions">
+            <button
+              type="button"
+              class="btn-cancel"
+              (click)="closeCreateEmployeeModal()"
+            >
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              class="btn-create"
+              [disabled]="!createEmployeeForm.valid || isCreatingEmployee"
+            >
+              {{ isCreatingEmployee ? 'Criando...' : 'Criar Funcionário' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Modal para editar funcionário -->
+@if (isEditEmployeeModalOpen && editingEmployee) {
+  <div class="modal-overlay" (click)="closeEditEmployeeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Editar Funcionário</h2>
+        <button class="btn-close" (click)="closeEditEmployeeModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <form (ngSubmit)="updateEmployee()" #editEmployeeForm="ngForm">
+          <div class="form-group">
+            <label for="editEmployeeName">Nome</label>
+            <input
+              type="text"
+              id="editEmployeeName"
+              [(ngModel)]="updatedEmployee.name"
+              name="editEmployeeName"
+              required
+              class="form-input"
+              placeholder="Digite o nome completo"
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="editEmployeeEmail">Email</label>
+            <input
+              type="email"
+              id="editEmployeeEmail"
+              [(ngModel)]="updatedEmployee.email"
+              name="editEmployeeEmail"
+              required
+              class="form-input"
+              placeholder="Digite o email"
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="editEmployeePhone">Telefone</label>
+            <input
+              type="tel"
+              id="editEmployeePhone"
+              [(ngModel)]="updatedEmployee.phone"
+              name="editEmployeePhone"
+              required
+              class="form-input"
+              placeholder="(00) 00000-0000"
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="editEmployeeRole">Cargo</label>
+            <select
+              id="editEmployeeRole"
+              [(ngModel)]="updatedEmployee.roleType"
+              name="editEmployeeRole"
+              required
+              class="form-input"
+            >
+              <option value="">Selecione um cargo</option>
+              @for (role of roles; track role) {
+                <option [value]="role">{{ getRoleDisplayName(role) }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="modal-actions">
+            <button
+              type="button"
+              class="btn-cancel"
+              (click)="closeEditEmployeeModal()"
+            >
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              class="btn-update"
+              [disabled]="!editEmployeeForm.valid || isUpdatingEmployee"
+            >
+              {{ isUpdatingEmployee ? 'Atualizando...' : 'Atualizar Funcionário' }}
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   </div>

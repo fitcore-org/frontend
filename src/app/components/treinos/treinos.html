@@ -13,881 +13,895 @@
   </div>
 
   <!-- Seção de Treinos Públicos -->
-  <div class="workout-section" *ngIf="getFilteredPublicWorkouts().length > 0">
-    <div class="section-header">
-      <h2 class="section-title">Treinos Públicos</h2>
-      <button class="btn-create-workout" (click)="openCreateWorkoutModal()">
-        Criar Treino Público
-      </button>
-    </div>
-    <div class="workouts-container">
-      <div 
-        *ngFor="let workout of getFilteredPublicWorkouts()" 
-        class="workout-card"
-      >
-        <div class="workout-header">
-          <h3>{{ workout.name }}</h3>
-          <span class="workout-type public">Público</span>
-        </div>
-        
-        <p class="workout-description">{{ workout.description }}</p>
-        
-        <div class="workout-stats">
-          <div class="stat">
-            <strong>{{ workout.items.length }}</strong> exercícios
+  @if (getFilteredPublicWorkouts().length > 0) {
+    <div class="workout-section">
+      <div class="section-header">
+        <h2 class="section-title">Treinos Públicos</h2>
+        <button class="btn-create-workout" (click)="openCreateWorkoutModal()">
+          Criar Treino Público
+        </button>
+      </div>
+      <div class="workouts-container">
+        @for (workout of getFilteredPublicWorkouts(); track workout.id) {
+          <div class="workout-card">
+            <div class="workout-header">
+              <h3>{{ workout.name }}</h3>
+              <span class="workout-type public">Público</span>
+            </div>
+            
+            <p class="workout-description">{{ workout.description }}</p>
+            
+            <div class="workout-stats">
+              <div class="stat">
+                <strong>{{ workout.items.length }}</strong> exercícios
+              </div>
+              <div class="stat">
+                <strong>{{ calculateTotalSets(workout) }}</strong> séries
+              </div>
+              <div class="stat">
+                <strong>{{ getMainMuscleGroups(workout) }}</strong>
+              </div>
+            </div>
+            
+            <div class="exercise-preview">
+              @for (item of workout.items.slice(0, 3); track item.id) {
+                <div class="exercise-item">
+                  <span class="exercise-name">{{ item.exercise.name }}</span>
+                  <span class="exercise-sets">{{ item.sets }}x{{ item.reps }}</span>
+                </div>
+              }
+              @if (workout.items.length > 3) {
+                <div class="more-exercises">
+                  +{{ workout.items.length - 3 }} exercícios
+                </div>
+              }
+            </div>
+            
+            <div class="workout-actions">
+              <button class="btn-view-workout" (click)="openWorkoutModal(workout)">
+                Ver Treino Completo
+              </button>
+            </div>
           </div>
-          <div class="stat">
-            <strong>{{ calculateTotalSets(workout) }}</strong> séries
-          </div>
-          <div class="stat">
-            <strong>{{ getMainMuscleGroups(workout) }}</strong>
-          </div>
-        </div>
-        
-        <div class="exercise-preview">
-          <div *ngFor="let item of workout.items.slice(0, 3)" class="exercise-item">
-            <span class="exercise-name">{{ item.exercise.name }}</span>
-            <span class="exercise-sets">{{ item.sets }}x{{ item.reps }}</span>
-          </div>
-          <div *ngIf="workout.items.length > 3" class="more-exercises">
-            +{{ workout.items.length - 3 }} exercícios
-          </div>
-        </div>
-        
-        <div class="workout-actions">
-          <button class="btn-view-workout" (click)="openWorkoutModal(workout)">
-            Ver Treino Completo
-          </button>
-          <div class="workout-secondary-actions">
-            <button class="btn-edit-workout" (click)="openEditWorkoutModal(workout); $event.stopPropagation()">
-              <img src="edit.svg" alt="Editar" width="16" height="16"> Editar
-            </button>
-            <button class="btn-delete-workout" (click)="deleteWorkout(workout.id, workout.name); $event.stopPropagation()">
-              <img src="delete.svg" alt="Deletar" width="16" height="16"> Deletar
-            </button>
-          </div>
-        </div>
+        }
       </div>
     </div>
-  </div>
+  }
 
   <!-- Seção de Treinos Privados -->
-  <div class="workout-section" *ngIf="getFilteredPrivateWorkouts().length > 0">
-    <div class="section-header">
-      <h2 class="section-title">Treinos Privados</h2>
-      <button class="btn-create-workout" (click)="openCreatePrivateWorkoutModal()">
-        Criar Treino Privado
-      </button>
-    </div>
-    <div class="workouts-container">
-      <div 
-        *ngFor="let workout of getFilteredPrivateWorkouts()" 
-        class="workout-card"
-      >
-        <div class="workout-header">
-          <h3>{{ workout.name }}</h3>
-          <span class="workout-type private">Privado</span>
-        </div>
-        
-        <p class="workout-description">{{ workout.description }}</p>
-        
-        <div class="workout-stats">
-          <div class="stat">
-            <strong>{{ workout.items.length }}</strong> exercícios
-          </div>
-          <div class="stat">
-            <strong>{{ calculateTotalSets(workout) }}</strong> séries
-          </div>
-          <div class="stat">
-            <strong>{{ getMainMuscleGroups(workout) }}</strong>
-          </div>
-          <div class="stat">
-            <strong>{{ workout.studentIds.length }}</strong> aluno(s)
-          </div>
-        </div>
+  @if (getFilteredPrivateWorkouts().length > 0) {
+    <div class="workout-section">
+      <div class="section-header">
+        <h2 class="section-title">Treinos Privados</h2>
+        <button class="btn-create-workout" (click)="openCreatePrivateWorkoutModal()">
+          Criar Treino Privado
+        </button>
+      </div>
+      <div class="workouts-container">
+        @for (workout of getFilteredPrivateWorkouts(); track workout.id) {
+          <div class="workout-card">
+            <div class="workout-header">
+              <h3>{{ workout.name }}</h3>
+              <span class="workout-type private">Privado</span>
+            </div>
+            
+            <p class="workout-description">{{ workout.description }}</p>
+            
+            <div class="workout-stats">
+              <div class="stat">
+                <strong>{{ workout.items.length }}</strong> exercícios
+              </div>
+              <div class="stat">
+                <strong>{{ calculateTotalSets(workout) }}</strong> séries
+              </div>
+              <div class="stat">
+                <strong>{{ getMainMuscleGroups(workout) }}</strong>
+              </div>
+              <div class="stat">
+                <strong>{{ workout.studentIds.length }}</strong> aluno(s)
+              </div>
+            </div>
 
-        <!-- Seção dos alunos com acesso -->
-        <div class="workout-students" *ngIf="workout.studentIds.length > 0">
-          <h4>Alunos com acesso:</h4>
-          <div class="students-list">
-            <span 
-              *ngFor="let studentId of workout.studentIds.slice(0, 3)" 
-              class="student-name"
-            >
-              {{ getStudentById(studentId)?.name || 'Nome não encontrado' }}
-            </span>
-            <span *ngIf="workout.studentIds.length > 3" class="more-students">
-              +{{ workout.studentIds.length - 3 }} aluno(s)
-            </span>
+            <!-- Seção dos alunos com acesso -->
+            @if (workout.studentIds.length > 0) {
+              <div class="workout-students">
+                <h4>Alunos com acesso:</h4>
+                <div class="students-list">
+                  @for (studentId of workout.studentIds.slice(0, 3); track studentId) {
+                    <span class="student-name">
+                      {{ getStudentById(studentId)?.name || 'Nome não encontrado' }}
+                    </span>
+                  }
+                  @if (workout.studentIds.length > 3) {
+                    <span class="more-students">
+                      +{{ workout.studentIds.length - 3 }} aluno(s)
+                    </span>
+                  }
+                </div>
+              </div>
+            }
+            
+            <div class="exercise-preview">
+              @for (item of workout.items.slice(0, 3); track item.id) {
+                <div class="exercise-item">
+                  <span class="exercise-name">{{ item.exercise.name }}</span>
+                  <span class="exercise-sets">{{ item.sets }}x{{ item.reps }}</span>
+                </div>
+              }
+              @if (workout.items.length > 3) {
+                <div class="more-exercises">
+                  +{{ workout.items.length - 3 }} exercícios
+                </div>
+              }
+            </div>
+            
+            <div class="workout-actions">
+              <button class="btn-edit-workout" (click)="openEditPrivateWorkoutModal(workout.id)">
+                Editar
+              </button>
+              <button class="btn-view-workout" (click)="openWorkoutModal(workout)">
+                Ver Treino Completo
+              </button>
+            </div>
           </div>
-        </div>
-        
-        <div class="exercise-preview">
-          <div *ngFor="let item of workout.items.slice(0, 3)" class="exercise-item">
-            <span class="exercise-name">{{ item.exercise.name }}</span>
-            <span class="exercise-sets">{{ item.sets }}x{{ item.reps }}</span>
-          </div>
-          <div *ngIf="workout.items.length > 3" class="more-exercises">
-            +{{ workout.items.length - 3 }} exercícios
-          </div>
-        </div>
-        
-        <div class="workout-actions">
-          <button class="btn-view-workout" (click)="openWorkoutModal(workout)">
-            Ver Treino Completo
-          </button>
-          <div class="workout-secondary-actions">
-            <button class="btn-manage-students" (click)="openStudentManagementModal(workout); $event.stopPropagation()">
-              Alunos
-            </button>
-            <button class="btn-edit-workout" (click)="openEditWorkoutModal(workout); $event.stopPropagation()">
-              <img src="edit.svg" alt="Editar" width="16" height="16"> Editar
-            </button>
-            <button class="btn-delete-workout" (click)="deleteWorkout(workout.id, workout.name); $event.stopPropagation()">
-              <img src="delete.svg" alt="Deletar" width="16" height="16"> Deletar
-            </button>
-          </div>
-        </div>
+        }
       </div>
     </div>
-  </div>
+  }
 
   <!-- Seção de Treinos Privados quando não há treinos -->
-  <div class="workout-section" *ngIf="getFilteredPrivateWorkouts().length === 0 && !workoutSearch">
-    <div class="section-header">
-      <h2 class="section-title">Treinos Privados</h2>
-      <button class="btn-create-workout" (click)="openCreatePrivateWorkoutModal()">
-        Criar Treino Privado
-      </button>
+  @if (getFilteredPrivateWorkouts().length === 0 && !workoutSearch) {
+    <div class="workout-section">
+      <div class="section-header">
+        <h2 class="section-title">Treinos Privados</h2>
+        <button class="btn-create-workout" (click)="openCreatePrivateWorkoutModal()">
+          Criar Treino Privado
+        </button>
+      </div>
+      <div class="no-results">
+        Nenhum treino privado disponível no momento.
+      </div>
     </div>
+  }
+
+  @if (getFilteredPublicWorkouts().length === 0 && getFilteredPrivateWorkouts().length === 0 && workoutSearch) {
     <div class="no-results">
-      Nenhum treino privado disponível no momento.
+      Nenhum treino encontrado para "{{ workoutSearch }}"
     </div>
-  </div>
+  }
 
-  <div class="no-results" *ngIf="getFilteredPublicWorkouts().length === 0 && getFilteredPrivateWorkouts().length === 0 && workoutSearch">
-    Nenhum treino encontrado para "{{ workoutSearch }}"
-  </div>
-
-  <div class="no-results" *ngIf="getAllWorkouts().length === 0 && !workoutSearch">
-    Nenhum treino disponível no momento.
-  </div>
+  @if (getAllWorkouts().length === 0 && !workoutSearch) {
+    <div class="no-results">
+      Nenhum treino disponível no momento.
+    </div>
+  }
 </div>
 
 <!-- Modal para criar treino -->
-<div class="modal-overlay" *ngIf="showCreateWorkoutModal" (click)="closeCreateWorkoutModal()">
-  <div class="modal-content create-workout-modal" (click)="$event.stopPropagation()">
-    <div class="modal-header">
-      <h2>Criar Novo Treino Público</h2>
-      <button class="close-btn" (click)="closeCreateWorkoutModal()">&times;</button>
-    </div>
-    
-    <div class="modal-body">
-      <form (ngSubmit)="createWorkout()" #workoutForm="ngForm">
-        <div class="form-group">
-          <label for="workoutName">Nome do Treino</label>
-          <input 
-            type="text" 
-            id="workoutName"
-            class="form-input" 
-            [(ngModel)]="newWorkout.name"
-            name="workoutName"
-            required
-            placeholder="Digite o nome do treino"
-          >
-        </div>
-        
-        <div class="form-group">
-          <label for="workoutDescription">Descrição</label>
-          <textarea 
-            id="workoutDescription"
-            class="form-textarea" 
-            [(ngModel)]="newWorkout.description"
-            name="workoutDescription"
-            required
-            placeholder="Descreva o treino"
-            rows="3"
-          ></textarea>
-        </div>
-        
-        <div class="exercise-selection">
-          <h3>Selecionar Exercícios</h3>
-          
-          <div class="exercise-search">
-            <input 
-              type="text" 
-              class="search-input" 
-              placeholder="Buscar exercícios..."
-              [(ngModel)]="exerciseSearch"
-              name="exerciseSearch"
-            >
-          </div>
-          
-          <div class="available-exercises">
-            <h4>Exercícios Disponíveis</h4>
-            <div class="exercises-list">
-              <div 
-                *ngFor="let exercise of getFilteredExercises()" 
-                class="exercise-item selectable"
-                (click)="addExerciseToWorkout(exercise)"
-              >
-                <div class="exercise-info">
-                  <span class="exercise-name">{{ exercise.name }}</span>
-                  <span class="muscle-group">{{ exercise.muscleGroup | titlecase }}</span>
-                </div>
-                <button type="button" class="btn-add">+</button>
-              </div>
-            </div>
-          </div>
-          
-          <div class="selected-exercises" *ngIf="newWorkout.items.length > 0">
-            <h4>Exercícios Selecionados ({{ newWorkout.items.length }})</h4>
-            <div class="workout-exercises">
-              <div 
-                *ngFor="let item of newWorkout.items; let i = index" 
-                class="workout-exercise-item"
-              >
-                <div class="exercise-order">
-                  <button 
-                    type="button" 
-                    class="btn-order" 
-                    (click)="moveExercise(i, -1)"
-                    [disabled]="i === 0"
-                  >↑</button>
-                  <span class="order-number">{{ i + 1 }}</span>
-                  <button 
-                    type="button" 
-                    class="btn-order" 
-                    (click)="moveExercise(i, 1)"
-                    [disabled]="i === newWorkout.items.length - 1"
-                  >↓</button>
-                </div>
-                
-                <div class="exercise-details">
-                  <div class="exercise-name">{{ getExerciseById(item.exerciseId)?.name }}</div>
-                  <div class="exercise-params">
-                    <div class="param-group">
-                      <label>Séries:</label>
-                      <input 
-                        type="number" 
-                        min="1" 
-                        [(ngModel)]="item.sets"
-                        name="sets_{{i}}"
-                        class="param-input"
-                        required
-                      >
-                    </div>
-                    <div class="param-group">
-                      <label>Reps:</label>
-                      <input 
-                        type="text" 
-                        [(ngModel)]="item.reps"
-                        name="reps_{{i}}"
-                        class="param-input"
-                        placeholder="8-12"
-                        required
-                      >
-                    </div>
-                    <div class="param-group">
-                      <label>Descanso (s):</label>
-                      <input 
-                        type="number" 
-                        min="0" 
-                        [(ngModel)]="item.restSeconds"
-                        name="rest_{{i}}"
-                        class="param-input"
-                        required
-                      >
-                    </div>
-                  </div>
-                  <div class="observation-group">
-                    <label>Observação:</label>
-                    <input 
-                      type="text" 
-                      [(ngModel)]="item.observation"
-                      name="observation_{{i}}"
-                      class="param-input"
-                      placeholder="Observações opcionais"
-                    >
-                  </div>
-                </div>
-                
-                <button 
-                  type="button" 
-                  class="btn-remove" 
-                  (click)="removeExerciseFromWorkout(i)"
-                >×</button>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <div class="modal-actions">
-          <button 
-            type="button" 
-            class="btn-cancel" 
-            (click)="closeCreateWorkoutModal()"
-          >
-            Cancelar
-          </button>
-          <button 
-            type="submit" 
-            class="btn-create" 
-            [disabled]="!workoutForm.valid || newWorkout.items.length === 0"
-          >
-            Criar Treino
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
-</div>
-
-<!-- Modal para exibir detalhes do treino -->
-<div class="modal-overlay" *ngIf="selectedWorkout" (click)="closeWorkoutModal()">
-  <div class="modal-content" (click)="$event.stopPropagation()">
-    <div class="modal-header">
-      <h2>{{ selectedWorkout.name }}</h2>
-      <button class="close-btn" (click)="closeWorkoutModal()">&times;</button>
-    </div>
-    
-    <div class="modal-body">
-      <div class="workout-overview">
-        <p class="workout-description">{{ selectedWorkout.description }}</p>
-        
-        <div class="workout-summary">
-          <div class="summary-item">
-            <strong>Total de exercícios:</strong> {{ selectedWorkout.items.length }}
-          </div>
-          <div class="summary-item">
-            <strong>Total de séries:</strong> {{ calculateTotalSets(selectedWorkout) }}
-          </div>
-          <div class="summary-item">
-            <strong>Grupos musculares:</strong> {{ getMainMuscleGroups(selectedWorkout) }}
-          </div>
-          <div class="summary-item">
-            <strong>Tempo estimado:</strong> {{ calculateEstimatedTime(selectedWorkout) }} min
-          </div>
-        </div>
+@if (showCreateWorkoutModal) {
+  <div class="modal-overlay" (click)="closeCreateWorkoutModal()">
+    <div class="modal-content create-workout-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Criar Novo Treino Público</h2>
+        <button class="close-btn" (click)="closeCreateWorkoutModal()">&times;</button>
       </div>
-
-      <div class="modal-workout-actions">
-        <button class="btn-edit-workout-modal" (click)="openEditWorkoutModal(selectedWorkout!)">
-          <img src="edit.svg" alt="Editar" width="16" height="16"> Editar Treino
-        </button>
-        <button class="btn-delete-workout-modal" (click)="deleteWorkout(selectedWorkout.id, selectedWorkout.name)">
-          <img src="delete.svg" alt="Deletar" width="16" height="16"> Deletar Treino
-        </button>
-      </div>
-
-      <h3>Exercícios do Treino</h3>
       
-      <div class="exercises-list">
-        <div *ngFor="let item of selectedWorkout.items" class="exercise-detail">
-          <div class="exercise-header">
-            <span class="exercise-order">{{ item.order }}</span>
-            <div class="exercise-info">
-              <h4>{{ item.exercise.name }}</h4>
-              <p class="muscle-group">{{ item.exercise.muscleGroup | titlecase }}</p>
-            </div>
-          </div>
-          
-          <div class="exercise-images" *ngIf="item.exercise.mediaUrl || item.exercise.mediaUrl2">
-            <img 
-              *ngIf="item.exercise.mediaUrl" 
-              [src]="item.exercise.mediaUrl" 
-              [alt]="item.exercise.name + ' - posição inicial'"
-              class="exercise-image"
-            >
-            <img 
-              *ngIf="item.exercise.mediaUrl2" 
-              [src]="item.exercise.mediaUrl2" 
-              [alt]="item.exercise.name + ' - execução'"
-              class="exercise-image"
-            >
-          </div>
-          
-          <div class="exercise-specs">
-            <div class="spec">
-              <strong>Séries:</strong> {{ item.sets }}
-            </div>
-            <div class="spec">
-              <strong>Repetições:</strong> {{ item.reps }}
-            </div>
-            <div class="spec">
-              <strong>Descanso:</strong> {{ item.restSeconds }}s
-            </div>
-            <div class="spec">
-              <strong>Equipamento:</strong> {{ item.exercise.equipment }}
-            </div>
-          </div>
-          
-          <div class="exercise-description">
-            <p><strong>Descrição:</strong> {{ item.exercise.description }}</p>
-          </div>
-          
-          <div class="exercise-observation" *ngIf="item.observation">
-            <p><strong>Observação:</strong> {{ item.observation }}</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Modal para criar treino privado -->
-<div class="modal-overlay" *ngIf="showCreatePrivateWorkoutModal" (click)="closeCreatePrivateWorkoutModal()">
-  <div class="modal-content create-workout-modal" (click)="$event.stopPropagation()">
-    <div class="modal-header">
-      <h2>Criar Novo Treino Privado</h2>
-      <button class="close-btn" (click)="closeCreatePrivateWorkoutModal()">&times;</button>
-    </div>
-    
-    <div class="modal-body">
-      <form (ngSubmit)="createPrivateWorkout()" #privateWorkoutForm="ngForm">
-        <div class="form-group">
-          <label for="privateWorkoutName">Nome do Treino</label>
-          <input 
-            type="text" 
-            id="privateWorkoutName"
-            class="form-input" 
-            [(ngModel)]="newPrivateWorkout.name"
-            name="privateWorkoutName"
-            required
-            placeholder="Digite o nome do treino"
-          >
-        </div>
-        
-        <div class="form-group">
-          <label for="privateWorkoutDescription">Descrição</label>
-          <textarea 
-            id="privateWorkoutDescription"
-            class="form-textarea" 
-            [(ngModel)]="newPrivateWorkout.description"
-            name="privateWorkoutDescription"
-            required
-            placeholder="Descreva o treino"
-            rows="3"
-          ></textarea>
-        </div>
-
-        <div class="student-selection">
-          <h3>Selecionar Alunos <span class="required-indicator">(obrigatório - mínimo 1)</span></h3>
-          
-          <div class="student-search">
+      <div class="modal-body">
+        <form (ngSubmit)="createWorkout()" #workoutForm="ngForm">
+          <div class="form-group">
+            <label for="workoutName">Nome do Treino</label>
             <input 
               type="text" 
-              class="search-input" 
-              placeholder="Buscar alunos por nome, CPF ou email..."
-              [(ngModel)]="studentSearch"
-              name="studentSearch"
-            >
-          </div>
-
-          <!-- Lista de alunos selecionados -->
-          <div class="selected-students" *ngIf="getSelectedStudentsForPrivateWorkout().length > 0">
-            <h4>Alunos Selecionados ({{ getSelectedStudentsForPrivateWorkout().length }})</h4>
-            <div class="students-list-modal">
-              <div 
-                *ngFor="let student of getSelectedStudentsForPrivateWorkout()" 
-                class="student-item"
-              >
-                <div class="student-info">
-                  <div class="student-name">{{ student.name }}</div>
-                  <div class="student-details">{{ student.cpf }} • {{ student.email }}</div>
-                  <div class="student-plan">{{ student.planType }} - {{ student.planDescription }}</div>
-                </div>
-                <button 
-                  type="button" 
-                  class="btn-remove-student" 
-                  (click)="removeStudentFromPrivateWorkout(student.id)"
-                  title="Remover aluno"
-                >
-                  ×
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <!-- Lista de alunos disponíveis -->
-          <div class="available-students">
-            <h4>Alunos Disponíveis</h4>
-            <div class="students-list-modal" *ngIf="getAvailableStudentsForPrivateWorkout().length > 0">
-              <div 
-                *ngFor="let student of getAvailableStudentsForPrivateWorkout()" 
-                class="student-item selectable"
-                (click)="addStudentToPrivateWorkout(student.id)"
-              >
-                <div class="student-info">
-                  <div class="student-name">{{ student.name }}</div>
-                  <div class="student-details">{{ student.cpf }} • {{ student.email }}</div>
-                  <div class="student-plan">{{ student.planType }} - {{ student.planDescription }}</div>
-                </div>
-                <button type="button" class="btn-add-student">+</button>
-              </div>
-            </div>
-            <div class="no-results" *ngIf="getAvailableStudentsForPrivateWorkout().length === 0">
-              <span *ngIf="!studentSearch">Todos os alunos já foram selecionados</span>
-              <span *ngIf="studentSearch">Nenhum aluno encontrado para "{{ studentSearch }}"</span>
-            </div>
-          </div>
-        </div>
-        
-        <div class="exercise-selection">
-          <h3>Selecionar Exercícios</h3>
-          
-          <div class="exercise-search">
-            <input 
-              type="text" 
-              class="search-input" 
-              placeholder="Buscar exercícios..."
-              [(ngModel)]="exerciseSearch"
-              name="exerciseSearch"
+              id="workoutName"
+              class="form-input" 
+              [(ngModel)]="newWorkout.name"
+              name="workoutName"
+              required
+              placeholder="Digite o nome do treino"
             >
           </div>
           
-          <div class="exercises-list">
-            <div 
-              *ngFor="let exercise of getFilteredExercises()" 
-              class="exercise-item"
-              (click)="addExerciseToPrivateWorkout(exercise)"
-            >
-              <div class="exercise-info">
-                <h4>{{ exercise.name }}</h4>
-                <p>{{ exercise.muscleGroup }}</p>
-              </div>
-              <button type="button" class="btn-add-exercise">+</button>
-            </div>
-          </div>
-        </div>
-        
-        <div class="selected-exercises" *ngIf="newPrivateWorkout.items.length > 0">
-          <h3>Exercícios Selecionados</h3>
-          <div class="exercise-list">
-            <div *ngFor="let item of newPrivateWorkout.items; let i = index" class="exercise-config">
-              <div class="exercise-header">
-                <h4>{{ getExerciseById(item.exerciseId)?.name }}</h4>
-                <button type="button" class="btn-remove" (click)="removeExerciseFromPrivateWorkout(i)">✕</button>
-              </div>
-              
-              <div class="exercise-params">
-                <div class="param-group">
-                  <label>Séries</label>
-                  <input 
-                    type="text" 
-                    class="param-input" 
-                    [(ngModel)]="item.sets"
-                    [name]="'sets_' + i"
-                  >
-                </div>
-                
-                <div class="param-group">
-                  <label>Repetições</label>
-                  <input 
-                    type="text" 
-                    class="param-input" 
-                    [(ngModel)]="item.reps"
-                    [name]="'reps_' + i"
-                  >
-                </div>
-                
-                <div class="param-group">
-                  <label>Descanso (seg)</label>
-                  <input 
-                    type="number" 
-                    class="param-input" 
-                    [(ngModel)]="item.restSeconds"
-                    [name]="'rest_' + i"
-                  >
-                </div>
-              </div>
-              
-              <div class="param-group full-width">
-                <label>Observação</label>
-                <input 
-                  type="text" 
-                  class="param-input" 
-                  [(ngModel)]="item.observation"
-                  [name]="'obs_' + i"
-                  placeholder="Observações opcionais"
-                >
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <div class="modal-footer">
-          <button type="button" class="btn-cancel" (click)="closeCreatePrivateWorkoutModal()">
-            Cancelar
-          </button>
-          <button 
-            type="submit" 
-            class="btn-confirm"
-            [disabled]="!privateWorkoutForm.form.valid || newPrivateWorkout.items.length === 0 || tempSelectedStudentIds.length === 0"
-          >
-            Criar Treino Privado
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
-</div>
-
-<!-- Modal para editar treino -->
-<div class="modal-overlay" *ngIf="showEditWorkoutModal" (click)="closeEditWorkoutModal()">
-  <div class="modal-content create-workout-modal" (click)="$event.stopPropagation()">
-    <div class="modal-header">
-      <h2>Editar Treino</h2>
-      <button class="close-btn" (click)="closeEditWorkoutModal()">&times;</button>
-    </div>
-    
-    <div class="modal-body">
-      <form (ngSubmit)="updateWorkout()" #editWorkoutForm="ngForm">
-        <div class="form-group">
-          <label for="editWorkoutName">Nome do Treino</label>
-          <input 
-            type="text" 
-            id="editWorkoutName"
-            class="form-input" 
-            [(ngModel)]="editWorkout.name"
-            name="editWorkoutName"
-            required
-            placeholder="Digite o nome do treino"
-          >
-        </div>
-        
-        <div class="form-group">
-          <label for="editWorkoutDescription">Descrição</label>
-          <textarea 
-            id="editWorkoutDescription"
-            class="form-textarea" 
-            [(ngModel)]="editWorkout.description"
-            name="editWorkoutDescription"
-            required
-            placeholder="Descreva o treino"
-            rows="3"
-          ></textarea>
-        </div>
-        
-        <div class="exercise-selection">
-          <h3>Editar Exercícios</h3>
-          
-          <div class="exercise-search">
-            <input 
-              type="text" 
-              class="search-input" 
-              placeholder="Buscar exercícios..."
-              [(ngModel)]="exerciseSearch"
-              name="exerciseSearchEdit"
-            >
+          <div class="form-group">
+            <label for="workoutDescription">Descrição</label>
+            <textarea 
+              id="workoutDescription"
+              class="form-textarea" 
+              [(ngModel)]="newWorkout.description"
+              name="workoutDescription"
+              required
+              placeholder="Descreva o treino"
+              rows="3"
+            ></textarea>
           </div>
           
-          <div class="available-exercises">
-            <h4>Exercícios Disponíveis</h4>
-            <div class="exercises-list">
-              <div 
-                *ngFor="let exercise of getFilteredExercises()" 
-                class="exercise-item selectable"
-                (click)="addExerciseToEditWorkout(exercise)"
+          <div class="exercise-selection">
+            <h3>Selecionar Exercícios</h3>
+            
+            <div class="exercise-search">
+              <input 
+                type="text" 
+                class="search-input" 
+                placeholder="Buscar exercícios..."
+                [(ngModel)]="exerciseSearch"
+                name="exerciseSearch"
               >
-                <div class="exercise-info">
-                  <span class="exercise-name">{{ exercise.name }}</span>
-                  <span class="muscle-group">{{ exercise.muscleGroup | titlecase }}</span>
-                </div>
-                <button type="button" class="btn-add">+</button>
-              </div>
             </div>
-          </div>
-          
-          <div class="selected-exercises" *ngIf="editWorkout.items.length > 0">
-            <h4>Exercícios Selecionados ({{ editWorkout.items.length }})</h4>
-            <div class="workout-exercises">
-              <div 
-                *ngFor="let item of editWorkout.items; let i = index" 
-                class="workout-exercise-item"
-              >
-                <div class="exercise-order">
-                  <button 
-                    type="button" 
-                    class="btn-order" 
-                    (click)="moveExerciseInEdit(i, -1)"
-                    [disabled]="i === 0"
-                  >↑</button>
-                  <span class="order-number">{{ i + 1 }}</span>
-                  <button 
-                    type="button" 
-                    class="btn-order" 
-                    (click)="moveExerciseInEdit(i, 1)"
-                    [disabled]="i === editWorkout.items.length - 1"
-                  >↓</button>
-                </div>
-                
-                <div class="exercise-details">
-                  <div class="exercise-name">{{ getExerciseById(item.exerciseId)?.name }}</div>
-                  <div class="exercise-params">
-                    <div class="param-group">
-                      <label>Séries:</label>
-                      <input 
-                        type="number" 
-                        min="1" 
-                        [(ngModel)]="item.sets"
-                        name="edit_sets_{{i}}"
-                        class="param-input"
-                        required
-                      >
+            
+            <div class="available-exercises">
+              <h4>Exercícios Disponíveis</h4>
+              <div class="exercises-list">
+                @for (exercise of getFilteredExercises(); track exercise.id) {
+                  <div class="exercise-item selectable" (click)="addExerciseToWorkout(exercise)">
+                    <div class="exercise-info">
+                      <span class="exercise-name">{{ exercise.name }}</span>
+                      <span class="muscle-group">{{ exercise.muscleGroup | titlecase }}</span>
                     </div>
-                    <div class="param-group">
-                      <label>Reps:</label>
-                      <input 
-                        type="text" 
-                        [(ngModel)]="item.reps"
-                        name="edit_reps_{{i}}"
-                        class="param-input"
-                        placeholder="8-12"
-                        required
-                      >
-                    </div>
-                    <div class="param-group">
-                      <label>Descanso (s):</label>
-                      <input 
-                        type="number" 
-                        min="0" 
-                        [(ngModel)]="item.restSeconds"
-                        name="edit_rest_{{i}}"
-                        class="param-input"
-                        required
-                      >
-                    </div>
+                    <button type="button" class="btn-add">+</button>
                   </div>
-                  <div class="observation-group">
-                    <label>Observação:</label>
-                    <input 
-                      type="text" 
-                      [(ngModel)]="item.observation"
-                      name="edit_observation_{{i}}"
-                      class="param-input"
-                      placeholder="Observações opcionais"
-                    >
-                  </div>
-                </div>
-                
-                <button 
-                  type="button" 
-                  class="btn-remove" 
-                  (click)="removeExerciseFromEditWorkout(i)"
-                >×</button>
+                }
               </div>
             </div>
+            
+            @if (newWorkout.items.length > 0) {
+              <div class="selected-exercises">
+                <h4>Exercícios Selecionados ({{ newWorkout.items.length }})</h4>
+                <div class="workout-exercises">
+                  @for (item of newWorkout.items; track $index; let i = $index) {
+                    <div class="workout-exercise-item">
+                      <div class="exercise-order">
+                        <button 
+                          type="button" 
+                          class="btn-order" 
+                          (click)="moveExercise(i, -1)"
+                          [disabled]="i === 0"
+                        >↑</button>
+                        <span class="order-number">{{ i + 1 }}</span>
+                        <button 
+                          type="button" 
+                          class="btn-order" 
+                          (click)="moveExercise(i, 1)"
+                          [disabled]="i === newWorkout.items.length - 1"
+                        >↓</button>
+                      </div>
+                      
+                      <div class="exercise-details">
+                        <div class="exercise-name">{{ getExerciseById(item.exerciseId)?.name }}</div>
+                        <div class="exercise-params">
+                          <div class="param-group">
+                            <label>Séries:</label>
+                            <input 
+                              type="number" 
+                              min="1" 
+                              [(ngModel)]="item.sets"
+                              name="sets_{{i}}"
+                              class="param-input"
+                              required
+                            >
+                          </div>
+                          <div class="param-group">
+                            <label>Reps:</label>
+                            <input 
+                              type="text" 
+                              [(ngModel)]="item.reps"
+                              name="reps_{{i}}"
+                              class="param-input"
+                              placeholder="8-12"
+                              required
+                            >
+                          </div>
+                          <div class="param-group">
+                            <label>Descanso (s):</label>
+                            <input 
+                              type="number" 
+                              min="0" 
+                              [(ngModel)]="item.restSeconds"
+                              name="rest_{{i}}"
+                              class="param-input"
+                              required
+                            >
+                          </div>
+                        </div>
+                        <div class="observation-group">
+                          <label>Observação:</label>
+                          <input 
+                            type="text" 
+                            [(ngModel)]="item.observation"
+                            name="observation_{{i}}"
+                            class="param-input"
+                            placeholder="Observações opcionais"
+                          >
+                        </div>
+                      </div>
+                      
+                      <button 
+                        type="button" 
+                        class="btn-remove" 
+                        (click)="removeExerciseFromWorkout(i)"
+                      >×</button>
+                    </div>
+                  }
+                </div>
+              </div>
+            }
           </div>
-        </div>
-        
-        <div class="modal-actions">
-          <button 
-            type="button" 
-            class="btn-cancel" 
-            (click)="closeEditWorkoutModal()"
-          >
-            Cancelar
-          </button>
-          <button 
-            type="submit" 
-            class="btn-update" 
-            [disabled]="!editWorkoutForm.valid || editWorkout.items.length === 0"
-          >
-            Atualizar Treino
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
-</div>
-
-<!-- Modal para gerenciar alunos do treino -->
-<div class="modal-overlay" *ngIf="showStudentManagementModal" (click)="closeStudentManagementModal()">
-  <div class="modal-content student-management-modal" (click)="$event.stopPropagation()">
-    <div class="modal-header">
-      <h2>Gerenciar Alunos - {{ selectedWorkoutForStudents?.name }}</h2>
-      <button class="close-btn" (click)="closeStudentManagementModal()">&times;</button>
-    </div>
-    
-    <div class="modal-body" *ngIf="selectedWorkoutForStudents">
-      <!-- Alunos com acesso ao treino -->
-      <div class="students-with-access" *ngIf="getTempStudentsFromWorkout().length > 0">
-        <h3>Alunos com acesso ({{ getTempStudentsFromWorkout().length }})</h3>
-        <div class="students-list-modal">
-          <div 
-            *ngFor="let student of getTempStudentsFromWorkout()" 
-            class="student-item"
-          >
-            <div class="student-info">
-              <div class="student-name">{{ student.name }}</div>
-              <div class="student-details">{{ student.cpf }} • {{ student.email }}</div>
-            </div>
+          
+          <div class="modal-actions">
             <button 
-              class="btn-remove-student" 
-              (click)="removeStudentFromWorkout(student.id)"
-              title="Remover aluno do treino"
+              type="button" 
+              class="btn-cancel" 
+              (click)="closeCreateWorkoutModal()"
             >
-              ×
+              Cancelar
+            </button>
+            <button 
+              type="submit" 
+              class="btn-create" 
+              [disabled]="!workoutForm.valid || newWorkout.items.length === 0"
+            >
+              Criar Treino
             </button>
           </div>
-        </div>
+        </form>
       </div>
+    </div>
+  </div>
+}
 
-      <!-- Buscar e adicionar alunos -->
-      <div class="add-students-section">
-        <h3>Adicionar Alunos</h3>
-        
-        <div class="student-search">
-          <input 
-            type="text" 
-            class="search-input" 
-            placeholder="Buscar alunos por nome, CPF ou email..."
-            [(ngModel)]="studentSearch"
-          >
-        </div>
-        
-        <div class="available-students" *ngIf="getAvailableStudents(selectedWorkoutForStudents).length > 0">
-          <h4>Alunos disponíveis ({{ getAvailableStudents(selectedWorkoutForStudents).length }})</h4>
-          <div class="students-list-modal">
-            <div 
-              *ngFor="let student of getAvailableStudents(selectedWorkoutForStudents)" 
-              class="student-item selectable"
-              (click)="addStudentToWorkout(student.id)"
-            >
-              <div class="student-info">
-                <div class="student-name">{{ student.name }}</div>
-                <div class="student-details">{{ student.cpf }} • {{ student.email }}</div>
-                <div class="student-plan">{{ student.planType }} - {{ student.planDescription }}</div>
-              </div>
-              <button type="button" class="btn-add-student">+</button>
+<!-- Modal para exibir detalhes do treino -->
+@if (selectedWorkout) {
+  <div class="modal-overlay" (click)="closeWorkoutModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>{{ selectedWorkout.name }}</h2>
+        <button class="close-btn" (click)="closeWorkoutModal()">&times;</button>
+      </div>
+      
+      <div class="modal-body">
+        <div class="workout-overview">
+          <p class="workout-description">{{ selectedWorkout.description }}</p>
+          
+          <div class="workout-summary">
+            <div class="summary-item">
+              <strong>Total de exercícios:</strong> {{ selectedWorkout.items.length }}
+            </div>
+            <div class="summary-item">
+              <strong>Total de séries:</strong> {{ calculateTotalSets(selectedWorkout) }}
+            </div>
+            <div class="summary-item">
+              <strong>Grupos musculares:</strong> {{ getMainMuscleGroups(selectedWorkout) }}
+            </div>
+            <div class="summary-item">
+              <strong>Tempo estimado:</strong> {{ calculateEstimatedTime(selectedWorkout) }} min
             </div>
           </div>
         </div>
 
-        <div *ngIf="getAvailableStudents(selectedWorkoutForStudents).length === 0" class="no-students">
-          <p *ngIf="studentSearch">Nenhum aluno encontrado para "{{ studentSearch }}"</p>
-          <p *ngIf="!studentSearch">Todos os alunos já têm acesso a este treino.</p>
+        <h3>Exercícios do Treino</h3>
+        
+        <div class="exercises-list">
+          @for (item of selectedWorkout.items; track item.id) {
+            <div class="exercise-detail">
+              <div class="exercise-header">
+                <span class="exercise-order">{{ item.order }}</span>
+                <div class="exercise-info">
+                  <h4>{{ item.exercise.name }}</h4>
+                  <p class="muscle-group">{{ item.exercise.muscleGroup | titlecase }}</p>
+                </div>
+              </div>
+              
+              @if (item.exercise.mediaUrl || item.exercise.mediaUrl2) {
+                <div class="exercise-images">
+                  @if (item.exercise.mediaUrl) {
+                    <img 
+                      [src]="item.exercise.mediaUrl" 
+                      [alt]="item.exercise.name + ' - posição inicial'"
+                      class="exercise-image"
+                    >
+                  }
+                  @if (item.exercise.mediaUrl2) {
+                    <img 
+                      [src]="item.exercise.mediaUrl2" 
+                      [alt]="item.exercise.name + ' - execução'"
+                      class="exercise-image"
+                    >
+                  }
+                </div>
+              }
+              
+              <div class="exercise-specs">
+                <div class="spec">
+                  <strong>Séries:</strong> {{ item.sets }}
+                </div>
+                <div class="spec">
+                  <strong>Repetições:</strong> {{ item.reps }}
+                </div>
+                <div class="spec">
+                  <strong>Descanso:</strong> {{ item.restSeconds }}s
+                </div>
+                <div class="spec">
+                  <strong>Equipamento:</strong> {{ item.exercise.equipment }}
+                </div>
+              </div>
+              
+              <div class="exercise-description">
+                <p><strong>Descrição:</strong> {{ item.exercise.description }}</p>
+              </div>
+              
+              @if (item.observation) {
+                <div class="exercise-observation">
+                  <p><strong>Observação:</strong> {{ item.observation }}</p>
+                </div>
+              }
+            </div>
+          }
         </div>
-      </div>
-
-      <!-- Botões de ação do modal -->
-      <div class="modal-actions">
-        <button 
-          type="button" 
-          class="btn-cancel" 
-          (click)="closeStudentManagementModal()"
-        >
-          Cancelar
-        </button>
-        <button 
-          type="button" 
-          class="btn-confirm" 
-          (click)="confirmStudentChanges()"
-        >
-          Confirmar Alterações
-        </button>
       </div>
     </div>
   </div>
-</div>
+}
+
+
+
+<!-- Modal para criar treino privado -->
+@if (showCreatePrivateWorkoutModal) {
+  <div class="modal-overlay" (click)="closeCreatePrivateWorkoutModal()">
+    <div class="modal-content create-workout-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Criar Novo Treino Privado</h2>
+        <button class="close-btn" (click)="closeCreatePrivateWorkoutModal()">&times;</button>
+      </div>
+      
+      <div class="modal-body">
+        <form (ngSubmit)="createPrivateWorkout()" #privateWorkoutForm="ngForm">
+          <div class="form-group">
+            <label for="privateWorkoutName">Nome do Treino <span class="required-indicator">*</span></label>
+            <input 
+              type="text" 
+              id="privateWorkoutName"
+              class="form-input" 
+              [(ngModel)]="newPrivateWorkout.name"
+              name="privateWorkoutName"
+              required
+              placeholder="Digite o nome do treino"
+            >
+          </div>
+          
+          <div class="form-group">
+            <label for="privateWorkoutDescription">Descrição <span class="required-indicator">*</span></label>
+            <textarea 
+              id="privateWorkoutDescription"
+              class="form-textarea" 
+              [(ngModel)]="newPrivateWorkout.description"
+              name="privateWorkoutDescription"
+              required
+              placeholder="Descreva o treino"
+              rows="3"
+            ></textarea>
+          </div>
+
+          <div class="student-selection">
+            <h3>Selecionar Alunos <span class="required-indicator">(obrigatório - mínimo 1)</span></h3>
+            
+            <div class="student-search">
+              <input 
+                type="text" 
+                class="search-input" 
+                placeholder="Buscar alunos por nome, CPF ou email..."
+                [(ngModel)]="studentSearch"
+                name="studentSearch"
+              >
+            </div>
+
+            <!-- Lista de alunos selecionados -->
+            @if (getSelectedStudentsForPrivateWorkout().length > 0) {
+              <div class="selected-students">
+                <h4>Alunos Selecionados ({{ getSelectedStudentsForPrivateWorkout().length }})</h4>
+                <div class="students-list-modal">
+                  @for (student of getSelectedStudentsForPrivateWorkout(); track student.id) {
+                    <div class="student-item">
+                      <div class="student-info">
+                        <div class="student-name">{{ student.name }}</div>
+                        <div class="student-details">{{ student.cpf }} • {{ student.email }}</div>
+                        <div class="student-plan">{{ student.planType }} - {{ student.planDescription }}</div>
+                      </div>
+                      <button 
+                        type="button" 
+                        class="btn-remove-student" 
+                        (click)="removeStudentFromPrivateWorkout(student.id)"
+                        title="Remover aluno"
+                      >
+                        ×
+                      </button>
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+
+            <!-- Lista de alunos disponíveis -->
+            <div class="available-students">
+              <h4>Alunos Disponíveis</h4>
+              @if (getAvailableStudentsForPrivateWorkout().length > 0) {
+                <div class="students-list-modal">
+                  @for (student of getAvailableStudentsForPrivateWorkout(); track student.id) {
+                    <div class="student-item selectable" (click)="addStudentToPrivateWorkout(student.id)">
+                      <div class="student-info">
+                        <div class="student-name">{{ student.name }}</div>
+                        <div class="student-details">{{ student.cpf }} • {{ student.email }}</div>
+                        <div class="student-plan">{{ student.planType }} - {{ student.planDescription }}</div>
+                      </div>
+                      <button type="button" class="btn-add-student">+</button>
+                    </div>
+                  }
+                </div>
+              }
+              @if (getAvailableStudentsForPrivateWorkout().length === 0) {
+                <div class="no-results">
+                  @if (!studentSearch) {
+                    <span>Todos os alunos já foram selecionados</span>
+                  }
+                  @if (studentSearch) {
+                    <span>Nenhum aluno encontrado para "{{ studentSearch }}"</span>
+                  }
+                </div>
+              }
+            </div>
+          </div>
+          
+          <div class="exercise-selection">
+            <h3>Selecionar Exercícios <span class="required-indicator">* (mínimo 1)</span></h3>
+            
+            <div class="exercise-search">
+              <input 
+                type="text" 
+                class="search-input" 
+                placeholder="Buscar exercícios..."
+                [(ngModel)]="exerciseSearch"
+                name="exerciseSearch"
+              >
+            </div>
+            
+            <div class="available-exercises">
+              <h4>Exercícios Disponíveis</h4>
+              <div class="exercises-list">
+                @for (exercise of getFilteredExercises(); track exercise.id) {
+                  <div class="exercise-item selectable" (click)="addExerciseToPrivateWorkout(exercise)">
+                    <div class="exercise-info">
+                      <span class="exercise-name">{{ exercise.name }}</span>
+                      <span class="muscle-group">{{ exercise.muscleGroup | titlecase }}</span>
+                    </div>
+                    <button type="button" class="btn-add">+</button>
+                  </div>
+                }
+              </div>
+            </div>
+          </div>
+          
+          @if (newPrivateWorkout.items.length > 0) {
+            <div class="selected-exercises">
+              <h4>Exercícios Selecionados ({{ newPrivateWorkout.items.length }})</h4>
+              <div class="workout-exercises">
+                @for (item of newPrivateWorkout.items; track $index; let i = $index) {
+                  <div class="workout-exercise-item">
+                    <div class="exercise-order">
+                      <button 
+                        type="button" 
+                        class="btn-order" 
+                        (click)="moveExerciseInPrivateWorkout(i, -1)"
+                        [disabled]="i === 0"
+                      >↑</button>
+                      <span class="order-number">{{ i + 1 }}</span>
+                      <button 
+                        type="button" 
+                        class="btn-order" 
+                        (click)="moveExerciseInPrivateWorkout(i, 1)"
+                        [disabled]="i === newPrivateWorkout.items.length - 1"
+                      >↓</button>
+                    </div>
+                    
+                    <div class="exercise-details">
+                      <div class="exercise-name">{{ getExerciseById(item.exerciseId)?.name }}</div>
+                      <div class="exercise-params">
+                        <div class="param-group">
+                          <label>Séries:</label>
+                          <input 
+                            type="number" 
+                            min="1" 
+                            [(ngModel)]="item.sets"
+                            name="private_sets_{{i}}"
+                            class="param-input"
+                            required
+                          >
+                        </div>
+                        <div class="param-group">
+                          <label>Reps:</label>
+                          <input 
+                            type="text" 
+                            [(ngModel)]="item.reps"
+                            name="private_reps_{{i}}"
+                            class="param-input"
+                            placeholder="8-12"
+                            required
+                          >
+                        </div>
+                        <div class="param-group">
+                          <label>Descanso (s):</label>
+                          <input 
+                            type="number" 
+                            min="0" 
+                            [(ngModel)]="item.restSeconds"
+                            name="private_rest_{{i}}"
+                            class="param-input"
+                            required
+                          >
+                        </div>
+                      </div>
+                      <div class="observation-group">
+                        <label>Observação:</label>
+                        <input 
+                          type="text" 
+                          [(ngModel)]="item.observation"
+                          name="private_observation_{{i}}"
+                          class="param-input"
+                          placeholder="Observações opcionais"
+                        >
+                      </div>
+                    </div>
+                    
+                    <button 
+                      type="button" 
+                      class="btn-remove" 
+                      (click)="removeExerciseFromPrivateWorkout(i)"
+                    >×</button>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+          
+          <div class="modal-actions">
+            <button 
+              type="button" 
+              class="btn-cancel" 
+              (click)="closeCreatePrivateWorkoutModal()"
+            >
+              Cancelar
+            </button>
+            <button 
+              type="submit" 
+              class="btn-create"
+              [disabled]="!privateWorkoutForm.valid || 
+                         newPrivateWorkout.items.length === 0 || 
+                         tempSelectedStudentIds.length === 0 ||
+                         !newPrivateWorkout.name || 
+                         !newPrivateWorkout.description"
+            >
+              Criar Treino Privado
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Modal para editar treino privado -->
+@if (showEditPrivateWorkoutModal) {
+  <div class="modal-overlay" (click)="closeEditPrivateWorkoutModal()">
+    <div class="modal-content create-workout-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Editar Treino Privado</h2>
+        <button class="close-btn" (click)="closeEditPrivateWorkoutModal()">&times;</button>
+      </div>
+      
+      <div class="modal-body">
+        <form (ngSubmit)="updatePrivateWorkout()" #editPrivateWorkoutForm="ngForm">
+          <div class="form-group">
+            <label for="editPrivateWorkoutName">Nome do Treino</label>
+            <input 
+              type="text" 
+              id="editPrivateWorkoutName"
+              class="form-input" 
+              [(ngModel)]="editPrivateWorkout.name"
+              name="editPrivateWorkoutName"
+              required
+              placeholder="Digite o nome do treino"
+            >
+          </div>
+          
+          <div class="form-group">
+            <label for="editPrivateWorkoutDescription">Descrição</label>
+            <textarea 
+              id="editPrivateWorkoutDescription"
+              class="form-textarea" 
+              [(ngModel)]="editPrivateWorkout.description"
+              name="editPrivateWorkoutDescription"
+              required
+              placeholder="Descreva o treino"
+              rows="3"
+            ></textarea>
+          </div>
+
+          <!-- Seleção de Estudantes -->
+          <div class="student-selection">
+            <h3>Estudantes com Acesso</h3>
+            
+            <div class="student-search">
+              <input 
+                type="text" 
+                class="search-input" 
+                placeholder="Buscar estudantes..."
+                [(ngModel)]="studentSearch"
+                name="studentSearchEdit"
+              >
+            </div>
+            
+            @if (getSelectedStudentsForEditPrivateWorkout().length > 0) {
+              <div class="selected-students">
+                <h4>Estudantes Selecionados ({{ getSelectedStudentsForEditPrivateWorkout().length }})</h4>
+                <div class="students-list">
+                  @for (student of getSelectedStudentsForEditPrivateWorkout(); track student.id) {
+                    <div class="student-item selected">
+                      <div class="student-info">
+                        <span class="student-name">{{ student.name }}</span>
+                        <span class="student-email">{{ student.email }}</span>
+                      </div>
+                      <button 
+                        type="button" 
+                        class="btn-remove" 
+                        (click)="removeStudentFromEditPrivateWorkout(student.id)"
+                      >×</button>
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+            
+            <div class="available-students">
+              <h4>Estudantes Disponíveis</h4>
+              <div class="students-list">
+                @for (student of getAvailableStudentsForEditPrivateWorkout(); track student.id) {
+                  <div class="student-item selectable" (click)="addStudentToEditPrivateWorkout(student)">
+                    <div class="student-info">
+                      <span class="student-name">{{ student.name }}</span>
+                      <span class="student-email">{{ student.email }}</span>
+                    </div>
+                    <button type="button" class="btn-add">+</button>
+                  </div>
+                }
+              </div>
+            </div>
+          </div>
+          
+          <div class="exercise-selection">
+            <h3>Editar Exercícios</h3>
+            
+            <div class="exercise-search">
+              <input 
+                type="text" 
+                class="search-input" 
+                placeholder="Buscar exercícios..."
+                [(ngModel)]="exerciseSearch"
+                name="exerciseSearchEdit"
+              >
+            </div>
+            
+            <div class="available-exercises">
+              <h4>Exercícios Disponíveis</h4>
+              <div class="exercises-list">
+                @for (exercise of getFilteredExercises(); track exercise.id) {
+                  <div class="exercise-item selectable" (click)="addExerciseToEditPrivateWorkout(exercise)">
+                    <div class="exercise-info">
+                      <span class="exercise-name">{{ exercise.name }}</span>
+                      <span class="muscle-group">{{ exercise.muscleGroup | titlecase }}</span>
+                    </div>
+                    <button type="button" class="btn-add">+</button>
+                  </div>
+                }
+              </div>
+            </div>
+            
+            @if (editPrivateWorkout.items.length > 0) {
+              <div class="selected-exercises">
+                <h4>Exercícios Selecionados ({{ editPrivateWorkout.items.length }})</h4>
+                <div class="workout-exercises">
+                  @for (item of editPrivateWorkout.items; track $index; let i = $index) {
+                    <div class="workout-exercise-item">
+                      <div class="exercise-order">
+                        <button 
+                          type="button" 
+                          class="btn-order" 
+                          (click)="moveExerciseInEditPrivateWorkout(i, -1)"
+                          [disabled]="i === 0"
+                        >↑</button>
+                        <span class="order-number">{{ i + 1 }}</span>
+                        <button 
+                          type="button" 
+                          class="btn-order" 
+                          (click)="moveExerciseInEditPrivateWorkout(i, 1)"
+                          [disabled]="i === editPrivateWorkout.items.length - 1"
+                        >↓</button>
+                      </div>
+                      
+                      <div class="exercise-details">
+                        <div class="exercise-name">{{ getExerciseById(item.exerciseId)?.name }}</div>
+                        <div class="exercise-params">
+                          <div class="param-group">
+                            <label>Séries:</label>
+                            <input 
+                              type="number" 
+                              min="1" 
+                              [(ngModel)]="item.sets"
+                              name="edit_sets_{{i}}"
+                              class="param-input"
+                              required
+                            >
+                          </div>
+                          <div class="param-group">
+                            <label>Reps:</label>
+                            <input 
+                              type="text" 
+                              [(ngModel)]="item.reps"
+                              name="edit_reps_{{i}}"
+                              class="param-input"
+                              placeholder="8-12"
+                              required
+                            >
+                          </div>
+                          <div class="param-group">
+                            <label>Descanso (s):</label>
+                            <input 
+                              type="number" 
+                              min="0" 
+                              [(ngModel)]="item.restSeconds"
+                              name="edit_rest_{{i}}"
+                              class="param-input"
+                              required
+                            >
+                          </div>
+                        </div>
+                        <div class="observation-group">
+                          <label>Observação:</label>
+                          <input 
+                            type="text" 
+                            [(ngModel)]="item.observation"
+                            name="edit_observation_{{i}}"
+                            class="param-input"
+                            placeholder="Observações opcionais"
+                          >
+                        </div>
+                      </div>
+                      
+                      <button 
+                        type="button" 
+                        class="btn-remove" 
+                        (click)="removeExerciseFromEditPrivateWorkout(i)"
+                      >×</button>
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+          
+          <div class="modal-actions">
+            <button 
+              type="button" 
+              class="btn-cancel" 
+              (click)="closeEditPrivateWorkoutModal()"
+            >
+              Cancelar
+            </button>
+            <button 
+              type="submit" 
+              class="btn-update" 
+              [disabled]="!editPrivateWorkoutForm.valid || editPrivateWorkout.items.length === 0"
+            >
+              Atualizar Treino
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+}

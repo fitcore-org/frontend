@@ -9,8 +9,23 @@
     "secure": false,
     "changeOrigin": true
   },
+  "/api/students/*": {
+    "target": "http://localhost:8081",
+    "secure": false,
+    "changeOrigin": true
+  },
   "/api/employees": {
     "target": "http://localhost:8081",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/api/employees/*": {
+    "target": "http://localhost:8081",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/positions": {
+    "target": "http://localhost:8004",
     "secure": false,
     "changeOrigin": true
   },
@@ -25,6 +40,11 @@
     "changeOrigin": true
   },
   "/api/v1/workouts/private": {
+    "target": "http://localhost:8082",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/api/v1/workouts/private/*": {
     "target": "http://localhost:8082",
     "secure": false,
     "changeOrigin": true
