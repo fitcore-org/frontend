@@ -1,1 +1,366 @@
-<p>financeiro works!</p>
+<div class="page-container">
+  <h1 class="page-title">Financeiro</h1>
+  
+  <!-- Seção de Gastos Gerais -->
+  <div class="section-container">
+    <div class="section-header">
+      <h2 class="section-title">Gastos Gerais da Academia</h2>
+      <div class="header-actions">
+        <button 
+          class="btn-secondary" 
+          (click)="toggleCreateExpense()">
+          {{ showCreateExpense() ? 'Cancelar' : 'Novo Gasto' }}
+        </button>
+        <button 
+          class="btn-primary" 
+          (click)="toggleExpenses()"
+          [disabled]="loadingExpenses()">
+          {{ showExpenses() ? 'Ocultar Gastos' : 'Ver Gastos' }}
+          @if (loadingExpenses()) {
+            <span class="spinner"></span>
+          }
+        </button>
+      </div>
+    </div>
+
+    @if (showCreateExpense()) {
+      <div class="create-expense-form">
+        <h3>Criar Novo Gasto</h3>
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="expenseDate">Data:</label>
+            <input 
+              type="date" 
+              id="expenseDate"
+              [(ngModel)]="newExpense.date" 
+              class="form-input">
+          </div>
+          
+          <div class="form-group">
+            <label for="expenseCategory">Categoria:</label>
+            <select 
+              id="expenseCategory"
+              [(ngModel)]="newExpense.category" 
+              class="form-input">
+              <option value="">Selecione uma categoria</option>
+              @for (category of getExpenseCategories(); track category) {
+                <option [value]="category">{{ getCategoryDisplayName(category) }}</option>
+              }
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label for="expenseValue">Valor:</label>
+            <input 
+              type="number" 
+              id="expenseValue"
+              [(ngModel)]="newExpense.value" 
+              min="0" 
+              step="0.01"
+              class="form-input">
+          </div>
+          
+          <div class="form-group">
+            <label for="expenseResponsible">Responsável:</label>
+            <input 
+              type="text" 
+              id="expenseResponsible"
+              [(ngModel)]="newExpense.responsible" 
+              class="form-input">
+          </div>
+          
+          <div class="form-group form-group-full">
+            <label for="expenseDescription">Descrição:</label>
+            <textarea 
+              id="expenseDescription"
+              [(ngModel)]="newExpense.description" 
+              class="form-input"
+              rows="3"></textarea>
+          </div>
+        </div>
+        
+        <div class="form-actions">
+          <button 
+            class="btn-primary" 
+            (click)="createExpense()">
+            Criar Gasto
+          </button>
+          <button 
+            class="btn-secondary" 
+            (click)="toggleCreateExpense()">
+            Cancelar
+          </button>
+        </div>
+      </div>
+    }
+
+    @if (errorExpenses()) {
+      <div class="error-message">
+        <span class="error-icon">⚠️</span>
+        <div class="error-text">
+          <h3>Erro de Conexão</h3>
+          <p>{{ errorExpenses() }}</p>
+          <div class="error-actions">
+            <button class="btn-retry" (click)="loadExpenses()">
+              <span>🔄</span> Tentar Novamente
+            </button>
+            <button class="btn-help" (click)="showHelp = !showHelp">
+              <span>❓</span> Ajuda
+            </button>
+          </div>
+          @if (showHelp) {
+            <div class="help-container">
+              <h4>🔧 Como resolver:</h4>
+              <ol>
+                <li>Verifique se o <strong>finance-service</strong> está rodando</li>
+                <li>Confirme que a porta <strong>8004</strong> está ativa</li>
+                <li>Execute: <code>cd finance-service && python app/main.py</code></li>
+                <li>Ou use Docker: <code>docker-compose up finance-service</code></li>
+              </ol>
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+    @if (showExpenses() && !loadingExpenses()) {
+      <div class="data-section">
+        <div class="summary-cards">
+          <div class="summary-card">
+            <div class="summary-value">{{ expenses.length }}</div>
+            <div class="summary-label">Total de Gastos</div>
+          </div>
+          <div class="summary-card paid">
+            <div class="summary-value">{{ formatCurrency(getTotalExpenses()) }}</div>
+            <div class="summary-label">Valor Total</div>
+          </div>
+          <div class="summary-card">
+            <div class="summary-value">{{ getManualExpensesCount() }}</div>
+            <div class="summary-label">Gastos Manuais</div>
+          </div>
+          <div class="summary-card unpaid">
+            <div class="summary-value">{{ getEmployeePaymentsCount() }}</div>
+            <div class="summary-label">Pagamentos de Funcionários</div>
+          </div>
+        </div>
+
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Descrição</th>
+                <th>Valor</th>
+                <th>Categoria</th>
+                <th>Responsável</th>
+                <th>Data do Gasto</th>
+                <th>Data de Criação</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (expense of expenses; track expense.id) {
+                <tr class="row-manual">
+                  <td>{{ expense.id }}</td>
+                  <td class="description">{{ expense.description || 'Sem descrição' }}</td>
+                  <td class="amount">{{ formatCurrency(expense.value) }}</td>
+                  <td>
+                    <span class="status-badge status-manual">
+                      {{ getCategoryDisplayName(expense.category) }}
+                    </span>
+                  </td>
+                  <td class="responsible">{{ expense.responsible }}</td>
+                  <td>{{ formatDate(expense.date) }}</td>
+                  <td>{{ formatDate(expense.created_at) }}</td>
+                  <td class="actions-cell">
+                    <button 
+                      class="btn-action btn-delete" 
+                      (click)="deleteExpense(expense.id)"
+                      title="Deletar Gasto">
+                      🗑️ Deletar
+                    </button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    }
+  </div>
+
+  <!-- Seção de Status de Pagamentos dos Funcionários -->
+  <div class="section-container">
+    <div class="section-header">
+      <h2 class="section-title">Status de Pagamentos dos Funcionários</h2>
+      <button 
+        class="btn-primary" 
+        (click)="togglePayments()"
+        [disabled]="loadingPayments()">
+        {{ showPayments() ? 'Ocultar Status' : 'Ver Status de Pagamentos' }}
+        @if (loadingPayments()) {
+          <span class="spinner"></span>
+        }
+      </button>
+    </div>
+
+    @if (errorPayments()) {
+      <div class="error-message">
+        {{ errorPayments() }}
+      </div>
+    }
+
+    @if (showPayments() && !loadingPayments()) {
+      <div class="data-section">
+        <div class="summary-cards">
+          <div class="summary-card">
+            <div class="summary-value">{{ paymentStatus.length }}</div>
+            <div class="summary-label">Total de Registros</div>
+          </div>
+          <div class="summary-card paid">
+            <div class="summary-value">{{ getPaidPaymentsCount() }}</div>
+            <div class="summary-label">Funcionários Pagos</div>
+          </div>
+          <div class="summary-card unpaid">
+            <div class="summary-value">{{ getUnpaidPaymentsCount() }}</div>
+            <div class="summary-label">Funcionários Não Pagos</div>
+          </div>
+        </div>
+
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>ID do Funcionário</th>
+                <th>Cargo</th>
+                <th>Status</th>
+                <th>Último Pagamento</th>
+                <th>Data de Criação</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (payment of paymentStatus; track payment.id) {
+                <tr [class.row-paid]="payment.paid" [class.row-unpaid]="!payment.paid">
+                  <td>{{ payment.id }}</td>
+                  <td class="student-id">{{ payment.employee_id }}</td>
+                  <td>{{ getPositionDisplayName(payment.position_name) }}</td>
+                  <td>
+                    <span class="status-badge" 
+                          [class.status-paid]="payment.paid" 
+                          [class.status-unpaid]="!payment.paid">
+                      {{ getStatusDisplayName(payment.paid) }}
+                    </span>
+                  </td>
+                  <td>{{ payment.last_payment ? formatDate(payment.last_payment) : 'Não realizado' }}</td>
+                  <td>{{ formatDate(payment.created_at) }}</td>
+                  <td class="actions-cell">
+                    <div class="action-buttons">
+                      @if (!payment.paid) {
+                        <button 
+                          class="btn-action btn-pay" 
+                          (click)="markAsPaid(payment.employee_id)"
+                          title="Marcar como Pago">
+                          💰 Pagar
+                        </button>
+                      }
+                      <button 
+                        class="btn-action btn-dismiss" 
+                        (click)="dismissEmployee(payment.employee_id)"
+                        title="Demitir Funcionário">
+                        ❌ Demitir
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    }
+  </div>
+
+  <!-- Seção de Configuração do Ciclo de Pagamento -->
+  <div class="section-container">
+    <div class="section-header">
+      <h2 class="section-title">Configuração do Ciclo de Pagamento</h2>
+      <button 
+        class="btn-primary" 
+        (click)="toggleCycleConfig()"
+        [disabled]="loadingCycleConfig()">
+        <span class="icon-config"></span>
+        {{ showCycleConfig() ? 'Ocultar Configuração' : 'Ver Configuração' }}
+        @if (loadingCycleConfig()) {
+          <span class="spinner"></span>
+        }
+      </button>
+    </div>
+
+    @if (errorCycleConfig()) {
+      <div class="error-message">
+        <span class="error-icon">⚠️</span>
+        <div class="error-text">
+          <h3>Erro de Configuração</h3>
+          <p>{{ errorCycleConfig() }}</p>
+        </div>
+      </div>
+    }
+
+    @if (showCycleConfig() && !loadingCycleConfig() && paymentCycleConfig) {
+      <div class="data-section">
+        <div class="config-container">
+          <div class="config-info">
+            <h3>Informações do Ciclo Atual</h3>
+            <div class="info-grid">
+              <div class="info-item">
+                <label>Dia do Reset:</label>
+                <span class="info-value">{{ paymentCycleConfig.reset_day }}</span>
+              </div>
+              <div class="info-item">
+                <label>Último Reset:</label>
+                <span class="info-value">{{ paymentCycleConfig.last_reset_date ? formatDate(paymentCycleConfig.last_reset_date) : 'Nunca' }}</span>
+              </div>
+              <div class="info-item">
+                <label>Criado em:</label>
+                <span class="info-value">{{ formatDate(paymentCycleConfig.created_at) }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="config-actions">
+            <div class="update-section">
+              <h3>Alterar Dia do Reset</h3>
+              <div class="input-group">
+                <label for="resetDay">Novo dia do mês (1-31):</label>
+                <input 
+                  type="number" 
+                  id="resetDay"
+                  [(ngModel)]="newResetDay" 
+                  min="1" 
+                  max="31" 
+                  class="form-input">
+                <button 
+                  class="btn-action btn-update" 
+                  (click)="updateCycleConfig()">
+                  Atualizar
+                </button>
+              </div>
+            </div>
+
+            <div class="reset-section">
+              <h3>Reset Manual</h3>
+              <p>Resetar todos os pagamentos para "pendente"</p>
+              <button 
+                class="btn-action btn-reset" 
+                (click)="resetPaymentCycle()">
+                Resetar Ciclo
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+</div>

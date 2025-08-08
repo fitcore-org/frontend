@@ -10,17 +10,20 @@
         Criar Funcionário
       </button>
     </div>
-    <input type="text" 
-           [(ngModel)]="employeeSearch" 
-           (ngModelChange)="filterEmployees()" 
-           placeholder="Buscar funcionário por nome..." 
-           class="search-input">
-    <select [(ngModel)]="selectedRole" (ngModelChange)="filterEmployees()" class="role-filter">
-      <option value="">Todos os papéis</option>
-      @for (role of roles; track role) {
-        <option [value]="role">{{ getRoleDisplayName(role) }}</option>
-      }
-    </select>
+    
+    <div class="search-filters-section">
+      <input type="text" 
+             [(ngModel)]="employeeSearch" 
+             (ngModelChange)="filterEmployees()" 
+             placeholder="Buscar funcionário por nome..." 
+             class="search-input">
+      <select [(ngModel)]="selectedRole" (ngModelChange)="filterEmployees()" class="role-filter">
+        <option value="">Todos os papéis</option>
+        @for (role of roles; track role) {
+          <option [value]="role">{{ getRoleDisplayName(role) }}</option>
+        }
+      </select>
+    </div>
   </div>
   
   <div class="employees-container">
