@@ -60,6 +60,6 @@ export const routes: Routes = [
     {
         path: 'facial',
         component: Facial,
-        canActivate: [guestGuard]
+        canActivate: [authGuard]
     },
 ];
