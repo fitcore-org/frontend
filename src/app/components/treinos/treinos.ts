@@ -73,6 +73,12 @@ interface UpdatePrivateWorkoutRequest {
   studentIds: string[];
 }
 
+interface UpdateWorkoutRequest {
+  name: string;
+  description: string;
+  items: CreateWorkoutItem[];
+}
+
 interface Workout {
   id: string;
   name: string;
@@ -130,6 +136,15 @@ export class Treinos implements OnInit {
   editingWorkoutId: string = '';
   tempEditSelectedStudentIds: string[] = []; // Lista temporária para seleção de alunos na edição
   originalStudentIds: string[] = []; // Guarde os IDs originais para preservar seleção
+
+  // Edit public workout modal properties
+  showEditPublicWorkoutModal = false;
+  editPublicWorkout: UpdateWorkoutRequest = {
+    name: '',
+    description: '',
+    items: []
+  };
+  editingPublicWorkoutId: string = '';
 
   get workoutSearch(): string {
     return this.searchTerm();
@@ -659,6 +674,131 @@ export class Treinos implements OnInit {
     totalTime += (workout.items.length - 1) * 30;
     
     return Math.ceil(totalTime / 60); 
+  }
+
+  deletePrivateWorkout(workoutId: string, workoutName: string): void {
+    if (confirm(`Tem certeza que deseja deletar o treino "${workoutName}"? Esta ação não pode ser desfeita.`)) {
+      this.http.delete(`/api/v1/workouts/private/${workoutId}`).subscribe({
+        next: () => {
+          alert('Treino privado deletado com sucesso!');
+          this.loadPrivateWorkouts(); 
+        },
+        error: (error) => {
+          console.error('Erro ao deletar treino privado:', error);
+          alert('Erro ao deletar treino privado. Tente novamente.');
+        }
+      });
+    }
+  }
+
+  deletePublicWorkout(workoutId: string, workoutName: string): void {
+    if (confirm(`Tem certeza que deseja deletar o treino "${workoutName}"? Esta ação não pode ser desfeita.`)) {
+      this.http.delete(`/api/v1/workouts/${workoutId}`).subscribe({
+        next: () => {
+          alert('Treino público deletado com sucesso!');
+          this.loadPublicWorkouts(); 
+        },
+        error: (error) => {
+          console.error('Erro ao deletar treino público:', error);
+          alert('Erro ao deletar treino público. Tente novamente.');
+        }
+      });
+    }
+  }
+
+  // Edit Public Workout Methods
+  loadPublicWorkoutById(workoutId: string): void {
+    this.http.get<Workout>(`/api/v1/workouts/${workoutId}`).subscribe({
+      next: (workout) => {
+        this.editPublicWorkout = {
+          name: workout.name,
+          description: workout.description,
+          items: workout.items.map(item => ({
+            exerciseId: item.exercise.id,
+            sets: item.sets,
+            reps: item.reps,
+            restSeconds: item.restSeconds,
+            observation: item.observation,
+            order: item.order
+          }))
+        };
+        this.editingPublicWorkoutId = workoutId;
+        this.showEditPublicWorkoutModal = true;
+      },
+      error: (error) => {
+        console.error('Erro ao carregar treino público:', error);
+        alert('Erro ao carregar treino público. Tente novamente.');
+      }
+    });
+  }
+
+  openEditPublicWorkoutModal(workoutId: string): void {
+    this.exerciseSearchTerm.set('');
+    this.loadPublicWorkoutById(workoutId);
+  }
+
+  closeEditPublicWorkoutModal(): void {
+    this.showEditPublicWorkoutModal = false;
+    this.editPublicWorkout = {
+      name: '',
+      description: '',
+      items: []
+    };
+    this.editingPublicWorkoutId = '';
+    this.exerciseSearchTerm.set('');
+  }
+
+  updatePublicWorkout(): void {
+    if (!this.editPublicWorkout.name.trim() || this.editPublicWorkout.items.length === 0) {
+      alert('Por favor, preencha o nome do treino e adicione pelo menos um exercício.');
+      return;
+    }
+
+    this.http.put(`/api/v1/workouts/${this.editingPublicWorkoutId}`, this.editPublicWorkout).subscribe({
+      next: () => {
+        alert('Treino público atualizado com sucesso!');
+        this.closeEditPublicWorkoutModal();
+        this.loadPublicWorkouts(); 
+      },
+      error: (error) => {
+        console.error('Erro ao atualizar treino público:', error);
+        alert('Erro ao atualizar treino público. Tente novamente.');
+      }
+    });
+  }
+
+  // Edit public workout helper methods
+  addExerciseToEditPublicWorkout(exercise: Exercise): void {
+    const newItem: CreateWorkoutItem = {
+      exerciseId: exercise.id,
+      sets: '3',
+      reps: '12',
+      restSeconds: 60,
+      observation: '',
+      order: this.editPublicWorkout.items.length + 1
+    };
+    
+    this.editPublicWorkout.items.push(newItem);
+  }
+
+  removeExerciseFromEditPublicWorkout(index: number): void {
+    this.editPublicWorkout.items.splice(index, 1);
+    this.editPublicWorkout.items.forEach((item, i) => {
+      item.order = i + 1;
+    });
+  }
+
+  moveExerciseInEditPublicWorkout(index: number, direction: number): void {
+    const newIndex = index + direction;
+    if (newIndex < 0 || newIndex >= this.editPublicWorkout.items.length) return;
+
+    const temp = this.editPublicWorkout.items[index];
+    this.editPublicWorkout.items[index] = this.editPublicWorkout.items[newIndex];
+    this.editPublicWorkout.items[newIndex] = temp;
+
+    this.editPublicWorkout.items.forEach((item, i) => {
+      item.order = i + 1;
+    });
   }
 
 

@@ -415,6 +415,43 @@
   justify-content: center;
 }
 
+.workout-action-buttons {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+  
+  .btn-edit-workout,
+  .btn-delete-workout {
+    flex: 1;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  @media (max-width: 768px) {
+    gap: 6px;
+    
+    .btn-edit-workout,
+    .btn-delete-workout {
+      padding: 10px 12px;
+      font-size: 0.85rem;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    flex-direction: column;
+    gap: 8px;
+    
+    .btn-edit-workout,
+    .btn-delete-workout {
+      flex: none;
+      padding: 12px 20px;
+      font-size: 0.9rem;
+    }
+  }
+}
+
 .workout-secondary-actions {
   display: flex;
   gap: 8px;

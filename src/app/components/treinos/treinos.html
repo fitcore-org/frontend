@@ -58,6 +58,14 @@
             </div>
             
             <div class="workout-actions">
+              <div class="workout-action-buttons">
+                <button class="btn-edit-workout" (click)="openEditPublicWorkoutModal(workout.id)">
+                  Editar
+                </button>
+                <button class="btn-delete-workout" (click)="deletePublicWorkout(workout.id, workout.name)">
+                  Deletar
+                </button>
+              </div>
               <button class="btn-view-workout" (click)="openWorkoutModal(workout)">
                 Ver Treino Completo
               </button>
@@ -136,9 +144,14 @@
             </div>
             
             <div class="workout-actions">
-              <button class="btn-edit-workout" (click)="openEditPrivateWorkoutModal(workout.id)">
-                Editar
-              </button>
+              <div class="workout-action-buttons">
+                <button class="btn-edit-workout" (click)="openEditPrivateWorkoutModal(workout.id)">
+                  Editar
+                </button>
+                <button class="btn-delete-workout" (click)="deletePrivateWorkout(workout.id, workout.name)">
+                  Deletar
+                </button>
+              </div>
               <button class="btn-view-workout" (click)="openWorkoutModal(workout)">
                 Ver Treino Completo
               </button>
@@ -896,6 +909,176 @@
               type="submit" 
               class="btn-update" 
               [disabled]="!editPrivateWorkoutForm.valid || editPrivateWorkout.items.length === 0"
+            >
+              Atualizar Treino
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Modal para editar treino público -->
+@if (showEditPublicWorkoutModal) {
+  <div class="modal-overlay" (click)="closeEditPublicWorkoutModal()">
+    <div class="modal-content create-workout-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Editar Treino Público</h2>
+        <button class="close-btn" (click)="closeEditPublicWorkoutModal()">&times;</button>
+      </div>
+      
+      <div class="modal-body">
+        <form (ngSubmit)="updatePublicWorkout()" #editPublicWorkoutForm="ngForm">
+          <div class="form-group">
+            <label for="editPublicWorkoutName">Nome do Treino</label>
+            <input 
+              type="text" 
+              id="editPublicWorkoutName"
+              class="form-input" 
+              [(ngModel)]="editPublicWorkout.name"
+              name="editPublicWorkoutName"
+              required
+              placeholder="Digite o nome do treino"
+            >
+          </div>
+          
+          <div class="form-group">
+            <label for="editPublicWorkoutDescription">Descrição</label>
+            <textarea 
+              id="editPublicWorkoutDescription"
+              class="form-textarea" 
+              [(ngModel)]="editPublicWorkout.description"
+              name="editPublicWorkoutDescription"
+              required
+              placeholder="Descreva o treino"
+              rows="3"
+            ></textarea>
+          </div>
+          
+          <div class="exercise-selection">
+            <h3>Editar Exercícios</h3>
+            
+            <div class="exercise-search">
+              <input 
+                type="text" 
+                class="search-input" 
+                placeholder="Buscar exercícios..."
+                [(ngModel)]="exerciseSearch"
+                name="exerciseSearchEditPublic"
+              >
+            </div>
+            
+            <div class="available-exercises">
+              <h4>Exercícios Disponíveis</h4>
+              <div class="exercises-list">
+                @for (exercise of getFilteredExercises(); track exercise.id) {
+                  <div class="exercise-item selectable" (click)="addExerciseToEditPublicWorkout(exercise)">
+                    <div class="exercise-info">
+                      <span class="exercise-name">{{ exercise.name }}</span>
+                      <span class="muscle-group">{{ exercise.muscleGroup | titlecase }}</span>
+                    </div>
+                    <button type="button" class="btn-add">+</button>
+                  </div>
+                }
+              </div>
+            </div>
+            
+            @if (editPublicWorkout.items.length > 0) {
+              <div class="selected-exercises">
+                <h4>Exercícios Selecionados ({{ editPublicWorkout.items.length }})</h4>
+                <div class="workout-exercises">
+                  @for (item of editPublicWorkout.items; track $index; let i = $index) {
+                    <div class="workout-exercise-item">
+                      <div class="exercise-order">
+                        <button 
+                          type="button" 
+                          class="btn-order" 
+                          (click)="moveExerciseInEditPublicWorkout(i, -1)"
+                          [disabled]="i === 0"
+                        >↑</button>
+                        <span class="order-number">{{ i + 1 }}</span>
+                        <button 
+                          type="button" 
+                          class="btn-order" 
+                          (click)="moveExerciseInEditPublicWorkout(i, 1)"
+                          [disabled]="i === editPublicWorkout.items.length - 1"
+                        >↓</button>
+                      </div>
+                      
+                      <div class="exercise-details">
+                        <div class="exercise-name">{{ getExerciseById(item.exerciseId)?.name }}</div>
+                        <div class="exercise-params">
+                          <div class="param-group">
+                            <label>Séries:</label>
+                            <input 
+                              type="number" 
+                              min="1" 
+                              [(ngModel)]="item.sets"
+                              name="edit_public_sets_{{i}}"
+                              class="param-input"
+                              required
+                            >
+                          </div>
+                          <div class="param-group">
+                            <label>Reps:</label>
+                            <input 
+                              type="text" 
+                              [(ngModel)]="item.reps"
+                              name="edit_public_reps_{{i}}"
+                              class="param-input"
+                              placeholder="8-12"
+                              required
+                            >
+                          </div>
+                          <div class="param-group">
+                            <label>Descanso (s):</label>
+                            <input 
+                              type="number" 
+                              min="0" 
+                              [(ngModel)]="item.restSeconds"
+                              name="edit_public_rest_{{i}}"
+                              class="param-input"
+                              required
+                            >
+                          </div>
+                        </div>
+                        <div class="observation-group">
+                          <label>Observação:</label>
+                          <input 
+                            type="text" 
+                            [(ngModel)]="item.observation"
+                            name="edit_public_observation_{{i}}"
+                            class="param-input"
+                            placeholder="Observações opcionais"
+                          >
+                        </div>
+                      </div>
+                      
+                      <button 
+                        type="button" 
+                        class="btn-remove" 
+                        (click)="removeExerciseFromEditPublicWorkout(i)"
+                      >×</button>
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+          
+          <div class="modal-actions">
+            <button 
+              type="button" 
+              class="btn-cancel" 
+              (click)="closeEditPublicWorkoutModal()"
+            >
+              Cancelar
+            </button>
+            <button 
+              type="submit" 
+              class="btn-update" 
+              [disabled]="!editPublicWorkoutForm.valid || editPublicWorkout.items.length === 0"
             >
               Atualizar Treino
             </button>
