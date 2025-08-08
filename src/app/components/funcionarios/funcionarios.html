@@ -10,20 +10,17 @@
         Criar Funcionário
       </button>
     </div>
-    
-    <div class="search-filters-section">
-      <input type="text" 
-             [(ngModel)]="employeeSearch" 
-             (ngModelChange)="filterEmployees()" 
-             placeholder="Buscar funcionário por nome..." 
-             class="search-input">
-      <select [(ngModel)]="selectedRole" (ngModelChange)="filterEmployees()" class="role-filter">
-        <option value="">Todos os papéis</option>
-        @for (role of roles; track role) {
-          <option [value]="role">{{ getRoleDisplayName(role) }}</option>
-        }
-      </select>
-    </div>
+    <input type="text" 
+           [(ngModel)]="employeeSearch" 
+           (ngModelChange)="filterEmployees()" 
+           placeholder="Buscar funcionário por nome..." 
+           class="search-input">
+    <select [(ngModel)]="selectedRole" (ngModelChange)="filterEmployees()" class="role-filter">
+      <option value="">Todos os papéis</option>
+      @for (role of roles; track role) {
+        <option [value]="role">{{ getRoleDisplayName(role) }}</option>
+      }
+    </select>
   </div>
   
   <div class="employees-container">
@@ -292,100 +289,115 @@
       </div>
       <div class="modal-body">
         <form (ngSubmit)="createEmployee()" #createEmployeeForm="ngForm">
-          <div class="form-group">
-            <label for="employeeName">Nome</label>
-            <input
-              type="text"
-              id="employeeName"
-              [(ngModel)]="newEmployee.name"
-              name="employeeName"
-              required
-              class="form-input"
-              placeholder="Digite o nome completo"
-            >
+          <div class="form-fields-row">
+            <!-- Coluna 1 -->
+            <div class="form-column">
+              <div class="form-group">
+                <label for="employeeName">Nome</label>
+                <input
+                  type="text"
+                  id="employeeName"
+                  [(ngModel)]="newEmployee.name"
+                  name="employeeName"
+                  required
+                  class="form-input"
+                  placeholder="Digite o nome completo"
+                >
+              </div>
+              <div class="form-group">
+                <label for="employeeCpf">CPF</label>
+                <input
+                  type="text"
+                  id="employeeCpf"
+                  [(ngModel)]="newEmployee.cpf"
+                  name="employeeCpf"
+                  required
+                  class="form-input"
+                  placeholder="000.000.000-00"
+                  maxlength="14"
+                  (input)="formatCPFInput($event)"
+                >
+              </div>
+              <div class="form-group">
+                <label for="employeePhone">Telefone</label>
+                <input
+                  type="tel"
+                  id="employeePhone"
+                  [(ngModel)]="newEmployee.phone"
+                  name="employeePhone"
+                  required
+                  class="form-input"
+                  placeholder="(00) 00000-0000"
+                >
+              </div>
+              <div class="form-group">
+                <label for="employeePassword">Senha</label>
+                <input
+                  type="password"
+                  id="employeePassword"
+                  [(ngModel)]="newEmployee.password"
+                  name="employeePassword"
+                  required
+                  class="form-input"
+                  placeholder="Crie uma senha"
+                  minlength="6"
+                >
+                <small class="form-hint">Mínimo de 6 caracteres</small>
+              </div>
+            </div>
+            <!-- Coluna 2 -->
+            <div class="form-column">
+              <div class="form-group">
+                <label for="employeeEmail">Email</label>
+                <input
+                  type="email"
+                  id="employeeEmail"
+                  [(ngModel)]="newEmployee.email"
+                  name="employeeEmail"
+                  required
+                  class="form-input"
+                  placeholder="Digite o email"
+                >
+              </div>
+              <div class="form-group">
+                <label for="employeeBirthDate">Data de Nascimento</label>
+                <input
+                  type="date"
+                  id="employeeBirthDate"
+                  [(ngModel)]="newEmployee.birthDate"
+                  name="employeeBirthDate"
+                  required
+                  class="form-input"
+                >
+              </div>
+              <div class="form-group">
+                <label for="employeeRole">Cargo</label>
+                <select
+                  id="employeeRole"
+                  [(ngModel)]="newEmployee.roleType"
+                  name="employeeRole"
+                  required
+                  class="form-input"
+                >
+                  <option value="">Selecione um cargo</option>
+                  @for (role of roles; track role) {
+                    <option [value]="role">{{ getRoleDisplayName(role) }}</option>
+                  }
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="employeeHireDate">Data de Contratação</label>
+                <input
+                  type="date"
+                  id="employeeHireDate"
+                  [(ngModel)]="newEmployee.hireDate"
+                  name="employeeHireDate"
+                  required
+                  class="form-input"
+                >
+              </div>
+            </div>
           </div>
-
-          <div class="form-group">
-            <label for="employeeEmail">Email</label>
-            <input
-              type="email"
-              id="employeeEmail"
-              [(ngModel)]="newEmployee.email"
-              name="employeeEmail"
-              required
-              class="form-input"
-              placeholder="Digite o email"
-            >
-          </div>
-
-          <div class="form-group">
-            <label for="employeeCpf">CPF</label>
-            <input
-              type="text"
-              id="employeeCpf"
-              [(ngModel)]="newEmployee.cpf"
-              name="employeeCpf"
-              required
-              class="form-input"
-              placeholder="000.000.000-00"
-              maxlength="14"
-              (input)="formatCPFInput($event)"
-            >
-          </div>
-
-          <div class="form-group">
-            <label for="employeeBirthDate">Data de Nascimento</label>
-            <input
-              type="date"
-              id="employeeBirthDate"
-              [(ngModel)]="newEmployee.birthDate"
-              name="employeeBirthDate"
-              required
-              class="form-input"
-            >
-          </div>
-
-          <div class="form-group">
-            <label for="employeePhone">Telefone</label>
-            <input
-              type="tel"
-              id="employeePhone"
-              [(ngModel)]="newEmployee.phone"
-              name="employeePhone"
-              required
-              class="form-input"
-              placeholder="(00) 00000-0000"
-            >
-          </div>
-
-          <div class="form-group">
-            <label for="employeeRole">Cargo</label>
-            <select
-              id="employeeRole"
-              [(ngModel)]="newEmployee.roleType"
-              name="employeeRole"
-              required
-              class="form-input"
-            >
-              <option value="">Selecione um cargo</option>
-              @for (role of roles; track role) {
-                <option [value]="role">{{ getRoleDisplayName(role) }}</option>
-              }
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label for="employeeHireDate">Data de Contratação</label>
-            <input
-              type="date"
-              id="employeeHireDate"
-              [(ngModel)]="newEmployee.hireDate"
-              name="employeeHireDate"
-              required
-              class="form-input"
-            >
-          </div>
-
           <div class="modal-actions">
             <button
               type="button"
@@ -402,7 +414,7 @@
               {{ isCreatingEmployee ? 'Criando...' : 'Criar Funcionário' }}
             </button>
           </div>
-        </form>
+        </form>        
       </div>
     </div>
   </div>

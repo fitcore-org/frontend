@@ -86,7 +86,7 @@ export class Register implements AfterViewInit {
       name,
       email,
       password,
-      role: "SECRETARY"
+      role: "MANAGER"
     };
 
     try {

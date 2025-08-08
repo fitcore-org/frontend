@@ -46,6 +46,7 @@ interface CreateEmployeeRequest {
   phone: string;
   roleType: string;
   hireDate: string;
+  password: string;
 }
 
 interface UpdateEmployeeRequest {
@@ -99,7 +100,8 @@ export class Funcionarios implements OnInit {
     birthDate: '',
     phone: '',
     roleType: '',
-    hireDate: ''
+    hireDate: '',
+    password: '',
   };
 
   // Employee edit properties
@@ -239,26 +241,24 @@ export class Funcionarios implements OnInit {
       birthDate: '',
       phone: '',
       roleType: '',
-      hireDate: ''
+      hireDate: '',
+      password: '' 
     };
   }
 
   createEmployee(): void {
     if (this.isCreatingEmployee) return;
-
-    const { name, email, cpf, birthDate, phone, roleType, hireDate } = this.newEmployee;
-    
-    // Validações mais específicas
+  
+    const { name, email, cpf, birthDate, phone, roleType, hireDate, password } = this.newEmployee;
+  
     if (!name.trim()) {
       alert('Nome é obrigatório.');
       return;
     }
-    
     if (!email.trim() || !this.isValidEmail(email)) {
       alert('Email válido é obrigatório.');
       return;
     }
-    
     if (!cpf.trim() || !this.isValidCPF(cpf)) {
       const cleanCPF = cpf.replace(/\D/g, '');
       if (cleanCPF.length !== 11) {
@@ -268,68 +268,77 @@ export class Funcionarios implements OnInit {
       }
       return;
     }
-    
     if (!birthDate) {
       alert('Data de nascimento é obrigatória.');
       return;
     }
-    
     if (!phone.trim()) {
       alert('Telefone é obrigatório.');
       return;
     }
-    
     if (!roleType) {
       alert('Cargo é obrigatório.');
       return;
     }
-    
     if (!hireDate) {
       alert('Data de contratação é obrigatória.');
       return;
     }
-
-    // Preparar dados exatamente como o Swagger especifica no Request Body
+    if (!password || password.length < 6) {
+      alert('Senha é obrigatória e deve ter pelo menos 6 caracteres.');
+      return;
+    }
+  
+    // Montar objetos para as duas requisições
     const employeeData = {
       name: name.trim(),
       email: email.trim(),
-      cpf: this.formatCPFForAPI(cpf), // Usar formatador específico para CPF
+      cpf: this.formatCPFForAPI(cpf),
       birthDate: this.formatDateForAPI(birthDate),
       phone: phone.trim(),
-      roleType: roleType, // Manter como roleType conforme o Swagger
-      hireDate: this.formatDateForAPI(hireDate)
+      roleType: roleType,
+      hireDate: this.formatDateForAPI(hireDate),
+      password: password
     };
-
-    console.log('CPF original:', cpf);
-    console.log('CPF formatado para API:', employeeData.cpf);
-    console.log('Dados sendo enviados (conforme Swagger):', employeeData);
-
+  
+    const registerData = {
+      name: name.trim(),
+      email: email.trim(),
+      password: password,
+      role: roleType,
+      cpf: this.formatCPFForAPI(cpf),
+      birthDate: this.formatDateForAPI(birthDate)
+    };
+  
     this.ngZone.run(() => {
       this.isCreatingEmployee = true;
       this.cdr.detectChanges();
-      
+  
+      // Primeiro, cadastrar o funcionário (dados administrativos)
       this.http.post<Employee>('/api/employees', employeeData).subscribe({
         next: (data) => {
-          console.log('Funcionário criado com sucesso:', data);
-          this.ngZone.run(() => {
-            this.loadEmployees();
-            this.closeCreateEmployeeModal();
-            alert('Funcionário criado com sucesso!');
+          this.http.post('/auth/register', registerData).subscribe({
+            next: (authData) => {
+              // Ambos deram certo!
+              this.ngZone.run(() => {
+                this.loadEmployees();
+                this.closeCreateEmployeeModal();
+                alert('Funcionário e usuário criados com sucesso!');
+              });
+            },
+            error: (authError) => {
+              console.error('Erro ao registrar em /auth/register:', authError);
+              this.ngZone.run(() => {
+                this.loadEmployees();
+                this.closeCreateEmployeeModal();
+                alert('Funcionário criado, mas houve erro ao criar login (auth/register)!');
+              });
+            }
           });
         },
         error: (error) => {
           console.error('Erro completo ao criar funcionário:', error);
-          console.error('Status:', error.status);
-          console.error('Mensagem:', error.message);
-          console.error('Body:', error.error);
-          
-          this.ngZone.run(() => {
-            this.isCreatingEmployee = false;
-            this.cdr.detectChanges();
-          });
-          
           let errorMessage = 'Erro ao criar funcionário.';
-          
           if (error.status === 400) {
             if (error.error && error.error.message) {
               errorMessage = `Dados inválidos: ${error.error.message}`;
@@ -343,12 +352,17 @@ export class Funcionarios implements OnInit {
           } else {
             errorMessage = `Erro ${error.status}: ${error.statusText || 'Erro desconhecido'}`;
           }
-          
           alert(errorMessage);
+  
+          this.ngZone.run(() => {
+            this.isCreatingEmployee = false;
+            this.cdr.detectChanges();
+          });
         }
       });
     });
   }
+  
 
   // Employee Edit Methods
   openEditEmployeeModal(employee: Employee): void {
